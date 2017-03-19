@@ -45,13 +45,11 @@ export class HomeComponent implements OnInit {
         this.allUserAccounts = acc.filter
          (a => a.ActiveUsers.findIndex(i => i.UserId == this.loggedInUserId) > -1);
         
-        //this.account = this.allUserAccounts.filter(x => x.IsFavourite == true)[0];
-        //bug to fix above in case no favourites are found
-        alert(this.allUserAccounts.length);
-        this.account = this.allUserAccounts[0];
+        this.account = this.allUserAccounts.filter(x => x.IsFavourite == true)[0];
+        //bug to fix above in case no favourites are found        
+                
         this.accountId = this.account.AccountId;    
-        this.accountIndex = this.allUserAccounts.indexOf(this.account);        
-        alert(this.account.AccountName);          
+        this.accountIndex = this.allUserAccounts.indexOf(this.account);                
     });        
   }
 
