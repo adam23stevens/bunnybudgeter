@@ -5,11 +5,11 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class UserService {
 
-  constructor() { this.setLoggedInUser("userA01") }
+  constructor() { }
   currUser: User;
 
   public getLoggedInUser() {
-    return this.currUser;
+    return this.getAllUsers()[0];
   }
 
   public getAllUsers() {
