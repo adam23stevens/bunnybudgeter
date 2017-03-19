@@ -23,8 +23,10 @@ export class HomeComponent implements OnInit {
   private accountIndex;
   subscription: Subscription;  
   devMode = true;
+  loggedInUserId = "";
 
-  ngOnInit() {            
+  ngOnInit() {
+    this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
     this.getAllUserAccounts();           
   }
 
@@ -41,7 +43,7 @@ export class HomeComponent implements OnInit {
   public getAllUserAccounts() {            
         this.subscription = this.accountService.baseFetchAccounts().subscribe((acc : Account[]) => {                      
         this.allUserAccounts = acc.filter
-         (a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);
+         (a => a.ActiveUsers.findIndex(i => i.UserId == this.loggedInUserId) > -1);
         
         this.account = this.allUserAccounts.filter(x => x.IsFavourite == true)[0];
         this.accountId = this.account.AccountId;    
