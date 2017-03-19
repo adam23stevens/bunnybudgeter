@@ -3,14 +3,14 @@ import { UserService } from './../user/user.service';
 import { Subscription } from 'rxjs/Subscription';
 import { Account } from './../account/Account';
 import { AccountService } from './../account/account.service';
-import { Component, OnInit, EventEmitter} from '@angular/core';
+import { Component, OnInit,OnChanges, EventEmitter} from '@angular/core';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styles: []
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnChanges {
 
   constructor(private accountService: AccountService
               , private userService: UserService
@@ -26,6 +26,10 @@ export class HomeComponent implements OnInit {
   loggedInUserId = "";
 
   ngOnInit() {
+    this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
+    this.getAllUserAccounts();           
+  }
+  ngOnChanges() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
     this.getAllUserAccounts();           
   }
@@ -47,7 +51,7 @@ export class HomeComponent implements OnInit {
         
         this.account = this.allUserAccounts.filter(x => x.IsFavourite == true)[0];
         //bug to fix above in case no favourites are found        
-                
+
         this.accountId = this.account.AccountId;    
         this.accountIndex = this.allUserAccounts.indexOf(this.account);                
     });        
