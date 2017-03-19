@@ -1,0 +1,40 @@
+<div *ngIf="account != null">
+    <bb-monthly-payments [accountId]="account.AccountId"></bb-monthly-payments>
+</div>
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="AccountName">Account Name</label>
+                        <input type="text" id="name" class="form-control" formControlName="AccountName">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="OverdraftLimit">Overdraft Limit</label>
+                        <input type="text" id="OverdraftLimit" class="form-control" formControlName="OverdraftLimit">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="IsPublic">Make this public?</label>
+                        <input type="checkbox" id="IsPublic" class="form-control" formControlName="IsPublic" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <button type="submit" class="btn btn-success" [disabled]="!accountForm.valid">Save</button>
+                    <a class="btn btn-danger" (click)="onCancel()">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

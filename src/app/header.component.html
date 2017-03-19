@@ -1,0 +1,29 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <li class="navbar-toggle collapsed dropdown pull-left" bbDropdown data-toggle="collapse" style="display:inline; left:0; margin-left: 5px;">
+                <span class="sr-only">Toggle navigation</span>
+                <!--<span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>-->
+                <img src='./../bunnypng.png' alt=" bunny ">
+                <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu <span class="caret"></span></a>-->
+                <ul class="dropdown-menu">
+                    <li routerLinkActive="active"><a [routerLink]="['/home']">Home</a></li>
+                    <li routerLinkActive="active"><a [routerLink]="['/accounts']">My Accounts</a></li>
+                    <li routerLinkActive="active"><a [routerLink]="['/paymentTypes']">My Payment Types</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li class="dropdown-header">My Settings</li>
+                </ul>
+            </li>
+            <!--<li class="navbar-toggle collapsed" style="display:inline; left:0;">
+                
+            </li>-->
+            <!--<a class="navbar-brand" href="#">Bunny Budgeter</a>-->
+            <h3>Bunny Budgeter</h3>
+        </div>
+
+        <!--/.nav-collapse -->
+    </div>
+    <!--/.container-fluid -->
+</nav>

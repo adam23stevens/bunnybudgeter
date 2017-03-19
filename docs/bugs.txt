@@ -1,0 +1,2 @@
+Bugs
+- error on isFavourite. need to set one by default or remove the concept entirely

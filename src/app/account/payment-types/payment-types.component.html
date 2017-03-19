@@ -1,0 +1,33 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <button class="btn btn-success" (click)="onSave()">Save</button>
+    </div>
+</div>
+<ul class="list-group" *ngFor="let acc of accounts">
+    <div class="row">
+        <div class="panel-success">
+            <div class="panel-heading">
+                <h4 class="list-group-item-heading">{{acc.AccountName}}</h4>
+                <p class="list-group-item-text">{{acc.TotalFunds | currency:'GBP':1.2-2}}</p>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <input type="text" class="form-control" #name placeholder="Name...">
+                    <input type="text" class="form-control" #amount placeholder="Amount...">
+                    <button class="btn btn-primary" (click)="onAdd(name.value, amount.value, acc.AccountId)">+</button>
+                    <hr>
+                    <ul class="list-group">
+                        <div *ngFor="let p of userPaymentTypes">
+                            <div *ngIf="p.AccountId == acc.AccountId">
+                                <li class="list-group-item">
+                                    {{p.Name}} - {{p.MonthlyAllowance | currency:'GBP':1.2-2}}
+                                    <button class="btn-btn-danger" (click)="onDel(p)">-</button>
+                                </li>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</ul>

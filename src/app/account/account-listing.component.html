@@ -1,0 +1,15 @@
+<div class="panel">
+    <div class="panel-heading">
+        <a class="btn btn-success" [routerLink]="['new']">New Account</a>
+    </div>
+</div>
+<ul class="list-group" *ngFor="let acc of accounts">
+    <div class="row" routerlinkActive='active' [routerLink]="acc.AccountId">
+        <div class="panel-success">
+            <div class="panel-heading" (click)="viewAcc(acc.AccountId)" style="cursor:pointer;">
+                <h4 class="list-group-item-heading">{{acc.AccountName}}</h4>
+                <p class="list-group-item-text">{{acc.TotalFunds | currency:'GBP':1.2-2}}</p>
+            </div>
+        </div>
+    </div>
+</ul>

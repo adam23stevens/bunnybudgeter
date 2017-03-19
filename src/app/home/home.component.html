@@ -1,0 +1,19 @@
+<div *ngIf="isBrandNew">
+    <h1>Welcome to bunny budgeter!</h1>
+    <p>Use the accounts menu at the top to start!</p>
+</div>
+
+<div class="form-group">
+    <button style="font-size: 10px;" class="btn btn-primary" (click)="previousAccount()"><</button>
+    <button style="font-size: 10px;" class="btn btn-primary" (click)="nextAccount()">></button>
+</div>
+
+<div *ngIf="devMode">
+    <button class="btn btn-danger" (click)="onMockAccounts()">mock accounts</button>
+    <button class="btn btn-danger" (click)="onMockMonthlyPayments()">mock monthly payments</button>
+    <button class="btn btn-danger" (click)="onMockPaymentTypes()">mock payment types</button>
+</div>
+
+<div *ngIf="!isBrandNew">
+    <bb-account-item [accountId]="accountId"></bb-account-item>
+</div>
