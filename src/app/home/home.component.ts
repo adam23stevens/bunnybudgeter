@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   subscription: Subscription;  
   timerSubscription: Subscription;
   devMode = true;
-  loggedInUserId = "";
+  loggedInUserId = "";  
 
   ngOnInit() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          

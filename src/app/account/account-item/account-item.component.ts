@@ -24,7 +24,8 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   private formBuilder: FormBuilder = new FormBuilder();
   private paymentForm: FormGroup;
   paymentTypes = new Array<UserPaymentTypes>();
-  subscription: Subscription;
+  subscription: Subscription;    
+  remainingFunds = 0;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService) {      
@@ -51,9 +52,18 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
        this.account = acc.filter(a => a.AccountId == this.accountId)[0];       
        //this.paymentTypes = this.paymentTypeService.getAllPaymentTypesForAccount(this.accountId);                                
        this.paymentTypeService.baseFetchUserPayments().subscribe(pt => {
-         this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);
-       })
-
+       this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);              
+       });
+       if (this.account.Outgoings != null) {
+         this.account.Outgoings.forEach(o => 
+           this.account.TotalFunds -= o.Amount
+         );
+       }
+        if(this.account.Income != null) {
+          this.account.Income.forEach(i => 
+            this.account.TotalFunds += i.Amount
+          );
+        }
      });
    }
 
@@ -98,6 +108,16 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     this.paymentForm.reset();
 
     this.getAccountInfo();    
+  }
+
+  onChangePaymentType(uptName: string) {
+    this.paymentTypeService.baseFetchUserPayments().subscribe(p =>    
+    {
+      var pType = p.filter(x => x.Name == uptName)[0];
+      this.remainingFunds = pType.MonthlyAllowance;
+
+      pType.Payments.forEach(p => this.remainingFunds -= p.Amount);
+    });
   }
 
   // addToPaymentType(newPayment: Payment) {

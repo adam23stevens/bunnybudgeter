@@ -4,6 +4,7 @@ import { PaymentType } from './PaymentType';
 export class UserPaymentTypes extends PaymentType {    
     public MonthlyAllowance: number;    
     public AccountId : string;
+    public RemainingFundsForMonth? : number;
     constructor() { super(); }
 }
 

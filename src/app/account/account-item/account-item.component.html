@@ -8,12 +8,15 @@
                     <div class="col-xs-12">
                         <div class="form-group">
                             <label for="PaymentTypes">Payment Type</label>
-                            <select formControlName="SelPaymentType" id="SelPaymentType" #paymentType [value]="adhoc">
+                            <select formControlName="SelPaymentType" id="SelPaymentType" #paymentType [value]="adhoc" (change)="onChangePaymentType($event.target.value)">
                                     <option [value]="adhoc">Adhoc</option>
                                     <option *ngFor="let type of paymentTypes" [value]="type.Name">
                                     {{type.Name}}
                                     </option>
                             </select>
+                            <div *ngIf="remainingFunds != null">
+                                {{remainingFunds | currency:'GBP':1.2-2}}
+                            </div>
                             <div *ngIf="paymentType.value != 'adhoc'">
                                 <label for="PaymentName">Name</label>
                                 <input type="text" id="name" class="form-control" formControlName="PaymentName">
