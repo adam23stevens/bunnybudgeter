@@ -3,14 +3,15 @@ import { UserService } from './../user/user.service';
 import { Subscription } from 'rxjs/Subscription';
 import { Account } from './../account/Account';
 import { AccountService } from './../account/account.service';
-import { Component, OnInit,OnChanges, EventEmitter} from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, EventEmitter } from '@angular/core';
+import { Observable } from "rxjs/Rx";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styles: []
 })
-export class HomeComponent implements OnInit, OnChanges {
+export class HomeComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(private accountService: AccountService
               , private userService: UserService
@@ -22,16 +23,22 @@ export class HomeComponent implements OnInit, OnChanges {
   private allUserAccounts: Array<Account>;
   private accountIndex;
   subscription: Subscription;  
+  timerSubscription: Subscription;
   devMode = true;
   loggedInUserId = "";
 
   ngOnInit() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
-    this.getAllUserAccounts();           
+    //this.subscribeToData();           
+    this.getAllUserAccounts();
   }
   ngOnChanges() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
-    this.getAllUserAccounts();           
+    //this.subscribeToData();           
+  }
+
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
   }
 
   onMockAccounts() {
@@ -44,16 +51,21 @@ export class HomeComponent implements OnInit, OnChanges {
     this.paymentTypesService.AddMockPaymentTypes().subscribe(a => alert('mock payment types got'));
   }
 
+  // private subscribeToData(){
+  //   this.timerSubscription = Observable.timer(2000).first().subscribe(() => this.getAllUserAccounts());
+  // }
+
   public getAllUserAccounts() {            
         this.subscription = this.accountService.baseFetchAccounts().subscribe((acc : Account[]) => {                      
         this.allUserAccounts = acc.filter
-         (a => a.ActiveUsers.findIndex(i => i.UserId == this.loggedInUserId) > -1);
-        
+        (a => a.ActiveUsers.findIndex(i => i.UserId == this.loggedInUserId) > -1);            
+
         this.account = this.allUserAccounts.filter(x => x.IsFavourite == true)[0];
         //bug to fix above in case no favourites are found        
 
         this.accountId = this.account.AccountId;    
         this.accountIndex = this.allUserAccounts.indexOf(this.account);                
+        //this.subscribeToData();
     });        
   }
 

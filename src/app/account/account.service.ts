@@ -22,7 +22,8 @@ export class AccountService implements OnInit {
   public currUser: User;
   private userAccounts: Array<Account>;
   private monthlyPayments = mockMonthlyPayments;  
-  private allAccounts = new Array<Account>();    
+  private allAccounts = new Array<Account>();  
+  private updatedAccount: Account;  
 
   constructor(private userService : UserService, private http: Http) { 
     this.currUser = this.userService.getLoggedInUser();        
@@ -183,20 +184,28 @@ export class AccountService implements OnInit {
     // mockMonthlyPayments.splice(mockMonthlyPayments.indexOf(mpayment), 1);
   }
   public addNewPayment(newPayment: Payment, account: Account, userTypeName: string) {    
-
-    mockPayments.push(newPayment);    
     
-    if (userTypeName != 'adhoc') {
-    var paymentType = mockUserPaymentTypes.filter(p => p.Name == userTypeName)[0];
-    if (paymentType.Payments == null) {
-      paymentType.Payments = new Array<Payment>();
-      }
-    paymentType.Payments.push(newPayment);
+    this.updatedAccount = account;
 
-    mockUserPaymentTypes[mockUserPaymentTypes.indexOf(paymentType)] = paymentType;
-    }
+    this.baseFetchAccounts().subscribe(acc =>
+    {      
+      var account: Account = acc.filter(a => a.AccountId == this.updatedAccount.AccountId)[0];
+      if (account.Outgoings == null) {
+        account.Outgoings = new Array<Payment>();
+      } 
+      if (account.Income == null) {
+        account.Income = new Array<Payment>();
+      }
+      //for now only adding outgoings will work
+      account.Outgoings.push(newPayment);    
       
-    mockAccounts.filter(a => a.AccountId == account.AccountId)[0].Outgoings.push(newPayment);     
-  }
+      this.EditAccount(account, account.AccountId);
+    });    
+  }   
+
+  fetchPayments(){
+    return this.http.get('https://bunnybudgeter.firebaseio.com/payments.json')
+    .map(response => response.json());
+  }  
 
 }

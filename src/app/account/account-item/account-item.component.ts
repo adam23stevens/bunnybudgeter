@@ -1,9 +1,10 @@
+import { Subscription } from 'rxjs/Subscription';
 import { Payment } from './../Payment';
 import { UserPaymentTypes } from './../UserPaymentTypes';
 import { PaymentTypesService } from './../payment-types/payment-types.service';
 import { Account } from './../Account';
 import { AccountService } from './../account.service';
-import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, OnDestroy } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -16,13 +17,14 @@ import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveForm
     }
   `]
 })
-export class AccountItemComponent implements OnInit, OnChanges {
+export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() accountId: string;
   account: Account = new Account("", "", 0, false, [], new Array<Payment>(), new Array<Payment>(), 0, false);
   private formBuilder: FormBuilder = new FormBuilder();
   private paymentForm: FormGroup;
   paymentTypes = new Array<UserPaymentTypes>();
+  subscription: Subscription;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService) {      
@@ -40,8 +42,12 @@ export class AccountItemComponent implements OnInit, OnChanges {
      this.initForm();
    }
 
+   ngOnDestroy() {
+     this.subscription.unsubscribe();
+   }
+
    getAccountInfo() {     
-      this.accountService.baseFetchAccounts().subscribe((acc: Account[]) => {              
+      this.subscription = this.accountService.baseFetchAccounts().subscribe((acc: Account[]) => {              
        this.account = acc.filter(a => a.AccountId == this.accountId)[0];       
        //this.paymentTypes = this.paymentTypeService.getAllPaymentTypesForAccount(this.accountId);                                
        this.paymentTypeService.baseFetchUserPayments().subscribe(pt => {
@@ -71,8 +77,18 @@ export class AccountItemComponent implements OnInit, OnChanges {
       '',      
       false
     );            
-    var paymentType = this.paymentForm.value.SelPaymentType;        
-    this.accountService.addNewPayment(newPayment, this.account, paymentType);    
+    var paymentType = this.paymentForm.value.SelPaymentType;            
+
+    if (paymentType != undefined) {
+      newPayment.paymentTypeName = paymentType;
+    }
+    this.accountService.addNewPayment(newPayment, this.account, paymentType);
+
+    this.paymentTypeService.baseFetchUserPayments().subscribe(paymentTypes => {
+      this.paymentTypes = paymentTypes;
+      this.paymentTypes[this.paymentTypes.indexOf(paymentType)].Payments.push(newPayment);
+      this.paymentTypeService.updatePaymentTypes(this.paymentTypes);
+    });
 
     this.clearControls();
   }
@@ -80,6 +96,8 @@ export class AccountItemComponent implements OnInit, OnChanges {
   clearControls(){
     alert('New payment done!');
     this.paymentForm.reset();
+
+    this.getAccountInfo();    
   }
 
   // addToPaymentType(newPayment: Payment) {
