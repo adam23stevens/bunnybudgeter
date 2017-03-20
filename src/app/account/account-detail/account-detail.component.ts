@@ -61,6 +61,13 @@ export class AccountDetailComponent implements OnInit{
     } else {
       newAccount.AccountId = this.account.AccountId;
       newAccount.IsFavourite = this.account.IsFavourite;
+      if (this.account.Outgoings != null) {
+        newAccount.Outgoings = this.account.Outgoings;
+      } 
+      if (this.account.Income != null) {
+        newAccount.Income = this.account.Income;
+      }
+      
       this.accountService.EditAccount(newAccount, this.account.AccountId);
     }    
 
