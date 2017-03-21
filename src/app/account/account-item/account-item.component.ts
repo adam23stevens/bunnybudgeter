@@ -87,16 +87,30 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       new Date(),
       '',      
       false
-    );            
+    );    
+
+    if (this.remainingFunds - newPayment.Amount < 0 && newPayment.paymentTypeName != undefined) {
+      if (!confirm('This payment goes over the limit for the selected payment type. Are you sure about this?')) {
+        this.clearControls();
+        return;
+      }
+    }
+
     var paymentType = this.paymentForm.value.SelPaymentType;            
 
     if (paymentType != undefined) {
       newPayment.paymentTypeName = paymentType;
+    } else {
+      newPayment.paymentTypeName = 'adhoc';
     }
+
     this.accountService.addNewPayment(newPayment, this.account, paymentType);
     
+    if (newPayment.paymentTypeName != 'adhoc') {
     this.paymentTypeService.baseFetchUserPayments().subscribe(paymentTypes => {
       this.paymentTypes = paymentTypes;
+      if (paymentTypes == null) return;
+
       var editPaymentType = this.paymentTypes.filter(p => p.Name == paymentType)[0];
       
       if(editPaymentType.Payments == undefined || editPaymentType.Payments == null) {
@@ -110,29 +124,30 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       this.paymentTypeService.updatePaymentTypes(this.paymentTypes)
       .subscribe();
     });
+    }
 
     this.clearControls();
   }
 
-  clearControls(){
-    alert('New payment done!');
+  clearControls(){    
     this.paymentForm.reset();
 
     this.getAccountInfo();    
   }
 
-  onChangePaymentType(uptName: string) {        
-    if (uptName != undefined) {
+  onChangePaymentType(uptName: string) {            
+    if (uptName != 'adhoc') {
     this.paymentTypeService.baseFetchUserPayments().subscribe(p =>    
     {      
       var pType = p.filter(x => x.Name == uptName)[0];      
+      if (pType != null) {
       this.remainingFunds = pType.MonthlyAllowance;
       
       this.showRemaining = true;
-      pType.Payments.forEach(p => this.remainingFunds -= p.Amount);
+      pType.Payments.forEach(p => this.remainingFunds -= p.Amount);      
+      }
     });
-  
-    } else {
+    } else {      
       this.showRemaining = false;
     }
 
