@@ -1,3 +1,4 @@
+import { InverterPipe } from './inverter.pipe';
 import { Subscription } from 'rxjs/Subscription';
 import { Payment } from './../Payment';
 import { UserPaymentTypes } from './../UserPaymentTypes';
@@ -50,17 +51,20 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
    getAccountInfo() {     
       this.subscription = this.accountService.baseFetchAccounts().subscribe((acc: Account[]) => {              
-       this.account = acc.filter(a => a.AccountId == this.accountId)[0];       
-       //this.paymentTypes = this.paymentTypeService.getAllPaymentTypesForAccount(this.accountId);                                
+        if (acc == null) return;
+       this.account = acc.filter(a => a.AccountId == this.accountId)[0];   
+       if (this.account == null) return;    
+
        this.paymentTypeService.baseFetchUserPayments().subscribe(pt => {
+         if (pt == null) return;
        this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);              
        });
-       if (this.account.Outgoings != null) {
+       if (this.account.Outgoings != undefined) {
          this.account.Outgoings.forEach(o => 
            this.account.TotalFunds -= o.Amount
          );
        }
-        if(this.account.Income != null) {
+        if(this.account.Income != undefined) {
           this.account.Income.forEach(i => 
             this.account.TotalFunds += i.Amount
           );
@@ -89,12 +93,16 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       false
     );    
 
-    if (this.remainingFunds - newPayment.Amount < 0 && newPayment.paymentTypeName != undefined) {
-      if (!confirm('This payment goes over the limit for the selected payment type. Are you sure about this?')) {
-        this.clearControls();
-        return;
+    if (this.remainingFunds - newPayment.Amount < 0 && this.showRemaining) {      
+        if (confirm('This payment goes over the limit for the selected payment type. Are you sure about this?')) {
+          this.doPayment(newPayment);                    
+        } else {
+          this.clearControls();
+        }
       }
     }
+
+    doPayment(newPayment: Payment){
 
     var paymentType = this.paymentForm.value.SelPaymentType;            
 
@@ -106,10 +114,10 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
     this.accountService.addNewPayment(newPayment, this.account, paymentType);
     
-    if (newPayment.paymentTypeName != 'adhoc') {
+    // if (newPayment.paymentTypeName != 'adhoc') {
     this.paymentTypeService.baseFetchUserPayments().subscribe(paymentTypes => {
       this.paymentTypes = paymentTypes;
-      if (paymentTypes == null) return;
+      //if (paymentTypes == null) return;
 
       var editPaymentType = this.paymentTypes.filter(p => p.Name == paymentType)[0];
       
@@ -122,12 +130,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         this.paymentTypes.filter(p => p.Name == paymentType)[0]
       )] = editPaymentType;
       this.paymentTypeService.updatePaymentTypes(this.paymentTypes)
-      .subscribe();
+      .subscribe(() => this.getAccountInfo());      
     });
+    //}
+    
+      this.clearControls();
     }
-
-    this.clearControls();
-  }
+  
 
   clearControls(){    
     this.paymentForm.reset();
@@ -140,30 +149,21 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     this.paymentTypeService.baseFetchUserPayments().subscribe(p =>    
     {      
       var pType = p.filter(x => x.Name == uptName)[0];      
-      if (pType != null) {
+      if (pType != null) 
+      {
       this.remainingFunds = pType.MonthlyAllowance;
       
       this.showRemaining = true;
-      pType.Payments.forEach(p => this.remainingFunds -= p.Amount);      
+      if (pType.Payments != undefined) {
+      pType.Payments.forEach(p => this.remainingFunds -= p.Amount);            
+       }
       }
     });
     } else {      
       this.showRemaining = false;
     }
 
-  }
-    
-  
-
-
-  // addToPaymentType(newPayment: Payment) {
-  //   var pType = this.paymentForm.value.SelPaymentType;
-  //   if (pType != 'adhoc') {      
-  //     this.paymentTypes.filter(p => p.Name == pType.Name)[0].Payments.push(newPayment);            
-  //   }
-  // }
-
-
+  }    
 }
 
 

@@ -18,6 +18,7 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './header.component';
 import { HomeComponent } from './home/home.component';
 import { MonthlyPaymentsEditComponent } from './account/monthly-payments/monthly-payments-edit/monthly-payments-edit.component';
+import { InverterPipe } from './account/account-item/inverter.pipe';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { MonthlyPaymentsEditComponent } from './account/monthly-payments/monthly
     PaymentTypesComponent,
     DropdownDirective,
     HomeComponent,
-    MonthlyPaymentsEditComponent
+    MonthlyPaymentsEditComponent,
+    InverterPipe
   ],
   imports: [
     BrowserModule,
