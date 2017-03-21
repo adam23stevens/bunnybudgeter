@@ -16,7 +16,7 @@ export class PaymentTypesService {
   }
 
   public AddMockPaymentTypes() {    
-    const body = mockUserPaymentTypes;
+    const body = JSON.stringify(mockUserPaymentTypes);
     const headers = new Headers();
     headers.append('Content-Type', 'application.json');
 
@@ -25,7 +25,7 @@ export class PaymentTypesService {
   }
 
   public updatePaymentTypes(updatedPaymentTypes : UserPaymentTypes[]) {
-    const body = updatedPaymentTypes;
+    const body = JSON.stringify(updatedPaymentTypes);
     const headers = new Headers();
     headers.append('Content-Type', 'application.json');
 

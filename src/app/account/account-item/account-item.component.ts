@@ -26,6 +26,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   paymentTypes = new Array<UserPaymentTypes>();
   subscription: Subscription;    
   remainingFunds = 0;
+  showRemaining: boolean = false;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService) {      
@@ -93,11 +94,21 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       newPayment.paymentTypeName = paymentType;
     }
     this.accountService.addNewPayment(newPayment, this.account, paymentType);
-
+    
     this.paymentTypeService.baseFetchUserPayments().subscribe(paymentTypes => {
       this.paymentTypes = paymentTypes;
-      this.paymentTypes[this.paymentTypes.indexOf(paymentType)].Payments.push(newPayment);
-      this.paymentTypeService.updatePaymentTypes(this.paymentTypes);
+      var editPaymentType = this.paymentTypes.filter(p => p.Name == paymentType)[0];
+      
+      if(editPaymentType.Payments == undefined || editPaymentType.Payments == null) {
+        editPaymentType.Payments = new Array<Payment>();
+      }
+      editPaymentType.Payments.push(newPayment);
+            
+      this.paymentTypes[this.paymentTypes.indexOf(
+        this.paymentTypes.filter(p => p.Name == paymentType)[0]
+      )] = editPaymentType;
+      this.paymentTypeService.updatePaymentTypes(this.paymentTypes)
+      .subscribe();
     });
 
     this.clearControls();
@@ -110,15 +121,25 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     this.getAccountInfo();    
   }
 
-  onChangePaymentType(uptName: string) {
+  onChangePaymentType(uptName: string) {        
+    if (uptName != undefined) {
     this.paymentTypeService.baseFetchUserPayments().subscribe(p =>    
-    {
-      var pType = p.filter(x => x.Name == uptName)[0];
+    {      
+      var pType = p.filter(x => x.Name == uptName)[0];      
       this.remainingFunds = pType.MonthlyAllowance;
-
+      
+      this.showRemaining = true;
       pType.Payments.forEach(p => this.remainingFunds -= p.Amount);
     });
+  
+    } else {
+      this.showRemaining = false;
+    }
+
   }
+    
+  
+
 
   // addToPaymentType(newPayment: Payment) {
   //   var pType = this.paymentForm.value.SelPaymentType;

@@ -5,6 +5,7 @@ import { UserPaymentTypes } from './../UserPaymentTypes';
 import { AccountService } from './../account.service';
 import { PaymentTypesService } from './payment-types.service';
 import { Component, OnInit, OnChanges } from '@angular/core';
+import { Payment } from "app/account/Payment";
 
 @Component({
   selector: 'bb-payment-types',
@@ -46,6 +47,7 @@ export class PaymentTypesComponent implements OnInit {
     upt.MonthlyAllowance = parseInt(amount);
     upt.IsAdhoc = true;
     upt.IsCredit = false;
+    upt.Payments = new Array<Payment>();
 
     this.userPaymentTypes.push(upt);    
     //this.update();
