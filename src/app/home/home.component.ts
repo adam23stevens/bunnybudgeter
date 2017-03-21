@@ -24,7 +24,7 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   private accountIndex;
   subscription: Subscription;  
   timerSubscription: Subscription;
-  devMode = true;
+  devMode = false;
   loggedInUserId = "";  
 
   ngOnInit() {
@@ -85,6 +85,10 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
 
   previousAccount(){
     this.skipByAccounts(-1);
+  }
+
+  calcMonthlyPayments(){
+    
   }
 
 }

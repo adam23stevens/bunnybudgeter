@@ -41,7 +41,7 @@
                     <i style="display:inline; float: right;">{{p.Date | date}}</i>
                 </div>
                 <div class="panel-body">
-                    {{p.Amount | currency:'GBP':1.2-2}}
+                    {{p.Amount | currency:'GBP':1.2-2}} - {{p.Date | date : 'medium' : 'enGb'}}
                 </div>
             </div>
         </div>
