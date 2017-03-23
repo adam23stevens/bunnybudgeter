@@ -1,3 +1,4 @@
+import { MonthlyPayment } from './../monthly-payments/monthly-payment';
 import { InverterPipe } from './inverter.pipe';
 import { Subscription } from 'rxjs/Subscription';
 import { Payment } from './../Payment';
@@ -28,25 +29,32 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   subscription: Subscription;    
   remainingFunds = 0;
   showRemaining: boolean = false;
+  accMp = new Array<MonthlyPayment>();
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService) {      
    }  
 
    ngOnInit(){                        
-     this.getAccountInfo();       
+     this.getAccountInfo2();       
 
      this.initForm();
    }
 
    ngOnChanges(){
-     this.getAccountInfo();
+     this.getAccountInfo2();
 
      this.initForm();
    }
 
    ngOnDestroy() {
      this.subscription.unsubscribe();
+   }
+
+   getAccountInfo2() {
+      if (this.accountId != undefined){
+      this.account = this.accountService.getAccountById(this.accountId);
+      }
    }
 
    getAccountInfo() {     
@@ -61,15 +69,18 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
        });
        if (this.account.Outgoings != undefined) {
          this.account.Outgoings.forEach(o => 
+           {if(!o.isPending) {
            this.account.TotalFunds -= o.Amount
+            }
+           }
          );
        }
         if(this.account.Income != undefined) {
           this.account.Income.forEach(i => 
             this.account.TotalFunds += i.Amount
           );
-        }
-     });
+        }              
+      });
    }
 
    initForm(){          

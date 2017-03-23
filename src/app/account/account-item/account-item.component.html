@@ -32,16 +32,18 @@
             </form>
         </div>
         <div class="panel-body" *ngIf="account.Outgoings!=null">
-            <div class="panel panel-danger" *ngFor="let p of account.Outgoings | inverter">
-                <div *ngIf="p.paymentTypeName != null" class="panel-heading">
-                    ({{p.paymentTypeName}}) - {{p.Name}}
-                </div>
-                <div *ngIf="p.paymentTypeName == null" class="panel-heading">
-                    {{p.Name}}
-                    <i style="display:inline; float: right;">{{p.Date | date}}</i>
-                </div>
-                <div class="panel-body">
-                    {{p.Amount | currency:'GBP':1.2-2}} - {{p.Date | date : 'medium' : 'enGb'}}
+            <div class="panel panel-danger" *ngFor="let p of account?.Outgoings | inverter">
+                <div *ngIf="!p.isPending">
+                    <div *ngIf="p.paymentTypeName != null" class="panel-heading">
+                        ({{p.paymentTypeName}}) - {{p.Name}}
+                    </div>
+                    <div *ngIf="p.paymentTypeName == null" class="panel-heading">
+                        {{p.Name}}
+                        <i style="display:inline; float: right;">{{p.Date | date}}</i>
+                    </div>
+                    <div class="panel-body">
+                        {{p.Amount | currency:'GBP':1.2-2}} - {{p.Date | date : 'medium' : 'enGb'}}
+                    </div>
                 </div>
             </div>
         </div>

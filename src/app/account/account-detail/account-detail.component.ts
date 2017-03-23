@@ -17,7 +17,7 @@ export class AccountDetailComponent implements OnInit{
 
   constructor(public accountService: AccountService
              ,public userService: UserService
-             ,public  routes: ActivatedRoute
+             ,public routes: ActivatedRoute
              ,public router :Router) { }
 
   private subscription;

@@ -24,6 +24,7 @@ export class AccountService implements OnInit {
   private monthlyPayments = mockMonthlyPayments;  
   private allAccounts = new Array<Account>();  
   private updatedAccount: Account;  
+  public accountsUpdated = new EventEmitter<Account[]>();
 
   constructor(private userService : UserService, private http: Http) { 
     this.currUser = this.userService.getLoggedInUser();        
@@ -97,16 +98,29 @@ export class AccountService implements OnInit {
     //return this.allAccounts.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.currUser.UserId) > -1);            
   }
 
-  public getAllUserAccounts(){}
-
-
-  public getAccountById(accountId: string) {    
-    return this.allAccounts.filter(a => a.AccountId == accountId)[0];    
-  }  
-
-  public getAllAccounts() {    
+  public getAccounts(){
     return this.allAccounts;
   }
+
+  public getAccountsById(id){
+    alert(id);
+    alert(this.allAccounts.length);
+    return this.allAccounts.filter(ac => ac.AccountId == id)[0];
+  }
+
+  public getAllUserAccounts(){
+    this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json')    
+    .map((response: Response) =>  response.json())
+    .subscribe((acc : Account[]) => {
+      this.allAccounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);
+      this.accountsUpdated.emit(this.allAccounts);
+    });
+  }
+
+  public getAccountById(accountId: string) {        
+    var account = this.allAccounts.filter(a => a.AccountId == accountId)[0];        
+    return account;
+  }  
 
   public baseFetchAccounts() :Observable<Account[]> {
     return this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json')    

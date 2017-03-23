@@ -51,22 +51,15 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.paymentTypesService.AddMockPaymentTypes().subscribe(a => alert('mock payment types got'));
   }
 
-  // private subscribeToData(){
-  //   this.timerSubscription = Observable.timer(2000).first().subscribe(() => this.getAllUserAccounts());
-  // }
-
-  public getAllUserAccounts() {            
-        this.subscription = this.accountService.baseFetchAccounts().subscribe((acc : Account[]) => {                      
-        this.allUserAccounts = acc.filter
-        (a => a.ActiveUsers.findIndex(i => i.UserId == this.loggedInUserId) > -1);            
-
-        this.account = this.allUserAccounts.filter(x => x.IsFavourite == true)[0];
-        //bug to fix above in case no favourites are found        
-
-        this.accountId = this.account.AccountId;    
-        this.accountIndex = this.allUserAccounts.indexOf(this.account);                
-        //this.subscribeToData();
-    });        
+  public getAllUserAccounts() {
+    this.subscription = this.accountService.accountsUpdated.subscribe(ac => 
+    {
+      this.allUserAccounts = ac;
+      this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
+      this.accountId = this.account.AccountId;
+      this.accountIndex = this.allUserAccounts.indexOf(this.account);
+    });
+    this.accountService.getAllUserAccounts();
   }
 
   skipByAccounts(byVal : number) {    
