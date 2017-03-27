@@ -71,42 +71,15 @@ export class AccountService implements OnInit {
     });
   }
 
-  public EditAccount(newAccount: Account, existingAccountId: string) {
-    //think about this
-    this.baseFetchAccounts().subscribe(a => 
-    {
-      this.allAccounts = a;  
-      this.allAccounts[this.allAccounts.indexOf(this.allAccounts.filter(a => a.AccountId == existingAccountId)[0])] = newAccount;      
-
-      // this.allAccounts[this.allAccounts.indexOf(existingAccount)] = newAccount;
-
-      const body = JSON.stringify(this.allAccounts);
-      const headers = new Headers();
-      headers.append('Content-Type', 'application.json');
-
-      this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json', body, {headers: headers})
-      .map((data: Response) => data.json())
-      .subscribe(() => alert('Account edited successfully'));
-    });
-  }   
-
   public setAllUserAccounts(obj : Account[]) : Subscription {      
     return this.baseFetchAccounts().subscribe(acc => {
         obj = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.currUser.UserId) > -1);
-    });
-
-    //return this.allAccounts.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.currUser.UserId) > -1);            
+    });  
   }
 
   public getAccounts(){
     return this.allAccounts;
-  }
-
-  public getAccountsById(id){
-    alert(id);
-    alert(this.allAccounts.length);
-    return this.allAccounts.filter(ac => ac.AccountId == id)[0];
-  }
+  }  
 
   public getAllUserAccounts(){
     this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json')    
@@ -196,26 +169,55 @@ export class AccountService implements OnInit {
 
     // var mpayment = this.getMonthlyPaymentFromId(monthlyPaymentId);
     // mockMonthlyPayments.splice(mockMonthlyPayments.indexOf(mpayment), 1);
-  }
-  public addNewPayment(newPayment: Payment, account: Account, userTypeName: string) {    
-    
-    this.updatedAccount = account;
+  }  
 
-    this.baseFetchAccounts().subscribe(acc =>
-    {      
-      var account: Account = acc.filter(a => a.AccountId == this.updatedAccount.AccountId)[0];
-      if (account.Outgoings == null) {
-        account.Outgoings = new Array<Payment>();
-      } 
-      if (account.Income == null) {
-        account.Income = new Array<Payment>();
-      }
-      //for now only adding outgoings will work
-      account.Outgoings.push(newPayment);    
-      
-      this.EditAccount(account, account.AccountId);
-    });    
+  public addNewPayment(newPayment: Payment, accountId: string, userTypeName: string){
+    this.updatedAccount = this.getAccountById(accountId);
+    if (this.updatedAccount.Outgoings == null) {
+      this.updatedAccount.Outgoings = new Array<Payment>();
+    }
+    if (this.updatedAccount.Income == null) {
+      this.updatedAccount.Income = new Array<Payment>();
+    }
+    
+    if (newPayment.Amount > 0) {
+      this.updatedAccount.Outgoings.push(newPayment);
+    } 
+    if (newPayment.Amount < 0) {
+      this.updatedAccount.Income.push(newPayment);
+    }
+
+    return this.EditAccount2(this.updatedAccount, accountId);
   }   
+
+  
+  public EditAccount2(newAccount: Account, accountId: string) {
+    var allAccounts = this.getAccounts();
+
+    this.allAccounts[this.allAccounts.indexOf(this.allAccounts.filter(a => a.AccountId === accountId)[0])] = newAccount;
+
+    const body = JSON.stringify(this.allAccounts);
+    const headers = new Headers();
+    headers.append('Content-Type', 'application.json');
+
+    return this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json', body, {headers: headers})
+      .map((data: Response) => data.json())      
+  }
+
+
+  public EditAccount(newAccount: Account, accountId: string) {
+    var allAccounts = this.getAccounts();
+
+    this.allAccounts[this.allAccounts.indexOf(this.allAccounts.filter(a => a.AccountId === accountId)[0])] = newAccount;
+
+    const body = JSON.stringify(this.allAccounts);
+    const headers = new Headers();
+    headers.append('Content-Type', 'application.json');
+
+    this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json', body, {headers: headers})
+      .map((data: Response) => data.json())
+      .subscribe(() => alert('Account edited successfully'));    
+  }
 
   fetchPayments(){
     return this.http.get('https://bunnybudgeter.firebaseio.com/payments.json')

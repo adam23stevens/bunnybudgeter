@@ -35,52 +35,45 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
               private paymentTypeService: PaymentTypesService) {      
    }  
 
-   ngOnInit(){                        
-     this.getAccountInfo2();       
+   ngOnInit(){
+     this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
+        (pt : UserPaymentTypes[]) => {
+           this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                    
+           this.CalculateOutgoings(this.account);
 
-     this.initForm();
+           this.getAccountInfo();                  
+        });                             
+
+        this.initForm();     
    }
 
    ngOnChanges(){
-     this.getAccountInfo2();
-
-     this.initForm();
+     this.getAccountInfo();
+     
    }
 
    ngOnDestroy() {
      this.subscription.unsubscribe();
    }
 
-   getAccountInfo2() {
+   getAccountInfo() {
       if (this.accountId != undefined){
       this.account = this.accountService.getAccountById(this.accountId);
+
+      this.paymentTypeService.fetchAllUserPayments();
       }
-   }
+   }   
 
-   getAccountInfo() {     
-      this.subscription = this.accountService.baseFetchAccounts().subscribe((acc: Account[]) => {              
-        if (acc == null) return;
-       this.account = acc.filter(a => a.AccountId == this.accountId)[0];   
-       if (this.account == null) return;    
-
-       this.paymentTypeService.baseFetchUserPayments().subscribe(pt => {
-         if (pt == null) return;
-       this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);              
-       });
-       if (this.account.Outgoings != undefined) {
-         this.account.Outgoings.forEach(o => 
-           {if(!o.isPending) {
-           this.account.TotalFunds -= o.Amount
-            }
-           }
-         );
-       }
-        if(this.account.Income != undefined) {
-          this.account.Income.forEach(i => 
-            this.account.TotalFunds += i.Amount
-          );
-        }              
-      });
+   CalculateOutgoings(acc: Account){
+     acc.TotalFunds = 0;
+      if(acc.Outgoings != undefined){
+        acc.Outgoings.forEach(
+          o => acc.TotalFunds -= o.isPending ? 0 : o.Amount);
+      }
+      if (acc.Income != undefined){
+        acc.Income.forEach(
+          i => acc.TotalFunds += i.isPending ? 0 : i.Amount);
+      }
    }
 
    initForm(){          
@@ -110,11 +103,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         } else {
           this.clearControls();
         }
-      }
+      } else {
+        this.doPayment(newPayment);
+      }      
     }
 
     doPayment(newPayment: Payment){
-
+    
     var paymentType = this.paymentForm.value.SelPaymentType;            
 
     if (paymentType != undefined) {
@@ -123,58 +118,48 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       newPayment.paymentTypeName = 'adhoc';
     }
 
-    this.accountService.addNewPayment(newPayment, this.account, paymentType);
-    
-    // if (newPayment.paymentTypeName != 'adhoc') {
-    this.paymentTypeService.baseFetchUserPayments().subscribe(paymentTypes => {
-      this.paymentTypes = paymentTypes;
-      //if (paymentTypes == null) return;
+    this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
+    .subscribe(() => {
+      this.assignToPaymentType(newPayment)            
+      this.getAccountInfo()
+      });        
+    }
 
-      var editPaymentType = this.paymentTypes.filter(p => p.Name == paymentType)[0];
-      
-      if(editPaymentType.Payments == undefined || editPaymentType.Payments == null) {
-        editPaymentType.Payments = new Array<Payment>();
+    assignToPaymentType(payment: Payment) {
+      var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
+
+      if (pType.Payments == undefined || pType.Payments == null) {
+        pType.Payments = new Array<Payment>();
       }
-      editPaymentType.Payments.push(newPayment);
-            
-      this.paymentTypes[this.paymentTypes.indexOf(
-        this.paymentTypes.filter(p => p.Name == paymentType)[0]
-      )] = editPaymentType;
-      this.paymentTypeService.updatePaymentTypes(this.paymentTypes)
-      .subscribe(() => this.getAccountInfo());      
-    });
-    //}
-    
+      pType.Payments.push(payment);
+
+        this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                
+          this.getAccountInfo();
+      });      
       this.clearControls();
     }
   
-
   clearControls(){    
     this.paymentForm.reset();
 
     this.getAccountInfo();    
-  }
+  }  
 
-  onChangePaymentType(uptName: string) {            
+  onChangePaymentType(uptName: string) {
     if (uptName != 'adhoc') {
-    this.paymentTypeService.baseFetchUserPayments().subscribe(p =>    
-    {      
-      var pType = p.filter(x => x.Name == uptName)[0];      
-      if (pType != null) 
-      {
-      this.remainingFunds = pType.MonthlyAllowance;
-      
-      this.showRemaining = true;
-      if (pType.Payments != undefined) {
-      pType.Payments.forEach(p => this.remainingFunds -= p.Amount);            
-       }
+      var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(uptName, this.accountId);
+      if (pType != null) {
+        this.remainingFunds = pType.MonthlyAllowance;
+
+        this.showRemaining = true;
+        if (pType.Payments != null) {
+          pType.Payments.forEach(p => this.remainingFunds -= p.Amount);
+        }
       }
-    });
-    } else {      
+    } else {
       this.showRemaining = false;
     }
-
-  }    
+  }   
 }
 
 

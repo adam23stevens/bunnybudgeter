@@ -2,14 +2,20 @@ import { Http, Headers, Response } from "@angular/http";
 import { PaymentType } from './../PaymentType';
 import { UserPaymentTypes } from './../UserPaymentTypes';
 import { mockUserPaymentTypes } from './../MockData/mockUserPaymentTypes';
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter, OnInit } from '@angular/core';
 import { Observable } from "rxjs/Rx";
 
 @Injectable()
-export class PaymentTypesService {
+export class PaymentTypesService implements OnInit {
 
   private userPayments: Array<UserPaymentTypes> = mockUserPaymentTypes;  
+  allPaymentTypes = new Array<UserPaymentTypes>();
+  OnPaymentTypesChanged = new EventEmitter<UserPaymentTypes[]>();
   constructor(private http: Http) { }
+
+  ngOnInit(){
+    this.fetchAllUserPayments();
+  }
 
   getAllPaymentTypesForAccount(accountId: string){
     return this.userPayments.filter(p => p.AccountId == accountId);
@@ -33,13 +39,45 @@ export class PaymentTypesService {
     .map((data: Response) => data.json());   
   }
 
+  public updatePaymentType(updatedPaymentType: UserPaymentTypes) {
+    var pTypes = this.getAllUserPaymentTypes();
+    pTypes[pTypes.indexOf(pTypes.filter(p => p.AccountId == updatedPaymentType.AccountId)
+                                .filter(p => p.Name == updatedPaymentType.Name)[0])] = updatedPaymentType;
+
+    return this.updatePaymentTypes(pTypes);
+  }
+
   public baseFetchUserPayments() :Observable<UserPaymentTypes[]> {
     return this.http.get('https://bunnybudgeter.firebaseio.com/paymenttypes.json')    
     .map((response: Response) =>  response.json());    
   }  
 
+  public fetchAllUserPayments() {
+    return this.http.get('https://bunnybudgeter.firebaseio.com/paymenttypes.json')    
+    .map((response: Response) =>  response.json())
+    .subscribe(pt => 
+    {
+      this.allPaymentTypes = pt;
+      this.OnPaymentTypesChanged.emit(this.allPaymentTypes);
+    });
+  }
+
+  public getAllUserPaymentTypes(){
+    return this.allPaymentTypes;
+  }
+
+  public getPaymentTypeByNameAndAccountId(name: string, accountId: string) {
+    return this.getAllUserPaymentTypes()
+      .filter(p => p.AccountId == accountId)
+      .filter(p => p.Name == name)[0];
+  }
+
+  public getAllAccountUserPaymentTypes(accountId: string) {
+    return this.getAllUserPaymentTypes().filter(pt => pt.AccountId == accountId);
+  }
+
   getAllStandardDefaultTypes(){
-          
+      
   }
 
   addNewType(upt: UserPaymentTypes) {
