@@ -36,9 +36,10 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     //this.subscribeToData();   
     this.getAllUserAccounts();
     this.accUrlSubscription = this.route.params.subscribe((p : any) => {
-      let aId = p['AccountId'];
+      let aId = p['AccountId'];      
       this.accountId = aId;            
-    });            
+    });  
+    this.navigateToAccount();          
   }
   ngOnChanges() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
@@ -66,8 +67,9 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
       if (this.accountId == undefined) {
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
       this.accountId = this.account.AccountId;      
-    } else {                
+    } else {                      
         this.account = this.allUserAccounts.filter(ac => ac.AccountId == this.accountId)[0];        
+        alert('found ' + this.account.AccountName);
       }
       this.accountIndex = this.allUserAccounts.indexOf(this.account);
       this.navigateToAccount();
@@ -98,8 +100,8 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   calcMonthlyPayments(){    
   }
 
-  navigateToAccount() {
-    if (this.accountId != null) {
+  navigateToAccount() {    
+    if (this.accountId != undefined) {
     this.router.navigate(['/home',this.accountId]);
     }
   }
