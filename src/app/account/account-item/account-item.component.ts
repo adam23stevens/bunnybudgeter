@@ -8,7 +8,7 @@ import { UserPaymentTypes } from './../UserPaymentTypes';
 import { PaymentTypesService } from './../payment-types/payment-types.service';
 import { Account } from './../Account';
 import { AccountService } from './../account.service';
-import { Component, OnInit, Input, OnChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
@@ -21,15 +21,14 @@ import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveForm
     }
   `]
 })
-export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
-
+export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {    
   accountId; 
   account: Account = new Account("", "", 0, false, [], new Array<Payment>(), new Array<Payment>(), 0, false);
   private formBuilder: FormBuilder = new FormBuilder();
   private paymentForm: FormGroup;
   paymentTypes = new Array<UserPaymentTypes>();
   subscription: Subscription; 
-  urlSubscription: Subscription;   
+  urlSubscription: Subscription;
   remainingFunds = 0;
   showRemaining: boolean = false;
   accMp = new Array<MonthlyPayment>();
@@ -43,17 +42,16 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    ngOnInit(){    
      this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
         (pt : UserPaymentTypes[]) => {           
-           this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                                                                
-           this.CalculateOutgoings(this.account);            
-                      
+           this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                                                                                                             
         });                                                                                   
         this.urlSubscription = this.route.params.subscribe((p : any) => 
-           {             
+           {                          
              this.accountId = p['AccountId'];
              this.getAccountInfo();
+             this.CalculateOutgoings(this.account);             
              this.paymentTypeService.fetchAllUserPayments();
-           });
-    this.initForm();
+             this.initForm();
+           });              
    }
 
    ngOnChanges(){
@@ -64,13 +62,14 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
      this.subscription.unsubscribe();
    }
 
-   getAccountInfo() {
-      if (this.accountId != undefined){
-      this.account = this.accountService.getAccountById(this.accountId);      
+   getAccountInfo() {     
+      if (this.accountId != null){
+      this.account = this.accountService.getAccountById(this.accountId);                        
       }
    }   
 
-   CalculateOutgoings(acc: Account){
+   CalculateOutgoings(acc: Account){     
+     if (acc == undefined) return;
      acc.TotalFunds = 0;
       if(acc.Outgoings != undefined){
         acc.Outgoings.forEach(
@@ -141,7 +140,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       alert('New payment added!');
         this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                          
           this.clearControls();
-          this.router.navigate(['/home']);
+          this.router.navigate(['/home']);          
       });            
     }
   

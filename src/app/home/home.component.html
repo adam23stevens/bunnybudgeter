@@ -15,8 +15,6 @@
 
     <button class="btn btn-danger" (click)="getAllUserAccounts()">Refresh accounts</button>
 </div>
-{{this.allUserAccounts?.length}}
-
 <div *ngIf="!isBrandNew">
     <bb-account-item></bb-account-item>
 </div>

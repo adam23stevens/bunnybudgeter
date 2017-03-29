@@ -1,8 +1,8 @@
 <div class="row">
     <div class="panel panel-success">
         <div class="panel-heading" style="padding-bottom: 100px;">
-            <b>{{account.AccountName}}</b><br>
-            <i>Currently available: {{account.TotalFunds | currency:'GBP':1.2-2}}</i>
+            <b>{{account?.AccountName}}</b><br>
+            <i>Currently available: {{account?.TotalFunds | currency:'GBP':1.2-2}}</i>
             <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
                 <div class="row">
                     <div class="col-xs-12">
@@ -31,7 +31,7 @@
                 <button type="submit" style="float:right; display:inline;" class="btn btn-success" [disabled]="!paymentForm.valid">Pay!</button>
             </form>
         </div>
-        <div class="panel-body" *ngIf="account.Outgoings!=null">
+        <div class="panel-body" *ngIf="account?.Outgoings!=null">
             <div class="panel panel-danger" *ngFor="let p of account?.Outgoings | inverter">
                 <div *ngIf="!p.isPending">
                     <div *ngIf="p.paymentTypeName != null" class="panel-heading">

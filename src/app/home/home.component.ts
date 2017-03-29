@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
               , private route : ActivatedRoute) { }
 
   private account: Account;
-  private accountId;
+  private accountId;  
   private isBrandNew = false;
   private allUserAccounts: Array<Account>;
   private accountIndex;
@@ -35,10 +35,10 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
     //this.subscribeToData();   
     this.getAllUserAccounts();
-    this.accUrlSubscription = this.route.params.subscribe((p : any) => {
-      let aId = p['AccountId'];      
-      this.accountId = aId;            
-    });  
+    // this.accUrlSubscription = this.route.params.subscribe((p : any) => {
+    //   let aId = p['AccountId'];      
+    //   this.accountId = aId;            
+    // });      
     this.navigateToAccount();          
   }
   ngOnChanges() {
@@ -64,13 +64,12 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.subscription = this.accountService.accountsUpdated.subscribe(ac => 
     {
       this.allUserAccounts = ac;
-      if (this.accountId == undefined) {
+      // if (this.accountId == undefined) {
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
       this.accountId = this.account.AccountId;      
-    } else {                      
-        this.account = this.allUserAccounts.filter(ac => ac.AccountId == this.accountId)[0];        
-        alert('found ' + this.account.AccountName);
-      }
+    // } else {                      
+        //this.account = this.allUserAccounts.filter(ac => ac.AccountId == this.accountId)[0];                
+      //}
       this.accountIndex = this.allUserAccounts.indexOf(this.account);
       this.navigateToAccount();
     });
@@ -101,7 +100,7 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   navigateToAccount() {    
-    if (this.accountId != undefined) {
+    if (this.accountId != undefined) {      
     this.router.navigate(['/home',this.accountId]);
     }
   }

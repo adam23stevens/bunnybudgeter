@@ -88,10 +88,10 @@ export class AccountService implements OnInit {
       this.allAccounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);
       this.accountsUpdated.emit(this.allAccounts);
     });
-  }
+  }  
 
   public getAccountById(accountId: string) {        
-    var account = this.allAccounts.filter(a => a.AccountId == accountId)[0];        
+    var account = this.allAccounts.filter(a => a.AccountId == accountId)[0];            
     return account;
   }  
 
