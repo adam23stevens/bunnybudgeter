@@ -39,18 +39,19 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    }  
 
    ngOnInit(){    
-     this.initForm();
      this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
         (pt : UserPaymentTypes[]) => {           
            this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                                                                
            this.CalculateOutgoings(this.account);            
-           this.urlSubscription = this.route.params.subscribe((p : any) => 
+                      
+        });                                                                                   
+        this.urlSubscription = this.route.params.subscribe((p : any) => 
            {             
              this.accountId = p['AccountId'];
              this.getAccountInfo();
-           });           
-        });                             
-    this.paymentTypeService.fetchAllUserPayments();                                          
+             this.paymentTypeService.fetchAllUserPayments();
+           });
+    this.initForm();
    }
 
    ngOnChanges(){
