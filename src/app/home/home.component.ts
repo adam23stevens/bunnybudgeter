@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { PaymentTypesService } from './../account/payment-types/payment-types.service';
 import { UserService } from './../user/user.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -15,7 +16,8 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(private accountService: AccountService
               , private userService: UserService
-              , private paymentTypesService: PaymentTypesService) { }
+              , private paymentTypesService: PaymentTypesService
+              , private router: Router) { }
 
   private account: Account;
   private accountId;
@@ -58,18 +60,21 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
       this.accountId = this.account.AccountId;
       this.accountIndex = this.allUserAccounts.indexOf(this.account);
+      this.navigateToAccount();
     });
-    this.accountService.getAllUserAccounts();
+    this.accountService.getAllUserAccounts();    
   }
 
-  skipByAccounts(byVal : number) {    
+  skipByAccounts(byVal : number) {        
     this.accountIndex = this.accountIndex + byVal < 0 
                      || this.accountIndex + byVal >= this.allUserAccounts.length ? 
     this.accountIndex : 
     this.accountIndex + byVal;
 
     this.account = this.allUserAccounts[this.accountIndex];          
-    this.accountId = this.account.AccountId;      
+    this.accountId = this.account.AccountId;    
+
+    this.navigateToAccount();
   }  
 
   nextAccount() {
@@ -80,8 +85,13 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.skipByAccounts(-1);
   }
 
-  calcMonthlyPayments(){
-    
+  calcMonthlyPayments(){    
+  }
+
+  navigateToAccount() {
+    if (this.accountId != null) {
+    this.router.navigate(['/home',this.accountId]);
+    }
   }
 
 }

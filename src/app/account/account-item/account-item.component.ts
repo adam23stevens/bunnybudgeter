@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { MonthlyPayment } from './../monthly-payments/monthly-payment';
 import { InverterPipe } from './inverter.pipe';
 import { Subscription } from 'rxjs/Subscription';
@@ -21,27 +22,33 @@ import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveForm
 })
 export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
-  @Input() accountId: string;
+  accountId; 
   account: Account = new Account("", "", 0, false, [], new Array<Payment>(), new Array<Payment>(), 0, false);
   private formBuilder: FormBuilder = new FormBuilder();
   private paymentForm: FormGroup;
   paymentTypes = new Array<UserPaymentTypes>();
-  subscription: Subscription;    
+  subscription: Subscription; 
+  urlSubscription: Subscription;   
   remainingFunds = 0;
   showRemaining: boolean = false;
   accMp = new Array<MonthlyPayment>();
 
   constructor(private accountService: AccountService,
-              private paymentTypeService: PaymentTypesService) {      
+              private paymentTypeService: PaymentTypesService,
+              private route: ActivatedRoute) {      
    }  
 
-   ngOnInit(){
+   ngOnInit(){    
      this.initForm();
      this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
         (pt : UserPaymentTypes[]) => {           
            this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                                                                
            this.CalculateOutgoings(this.account);            
-           this.getAccountInfo();
+           this.urlSubscription = this.route.params.subscribe((p : any) => 
+           {             
+             this.accountId = p['AccountId'];
+             this.getAccountInfo();
+           });           
         });                             
     this.paymentTypeService.fetchAllUserPayments();                                          
    }
@@ -56,9 +63,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
    getAccountInfo() {
       if (this.accountId != undefined){
-      this.account = this.accountService.getAccountById(this.accountId);
-
-      this.paymentTypeService.fetchAllUserPayments();
+      this.account = this.accountService.getAccountById(this.accountId);      
       }
    }   
 
@@ -119,7 +124,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
     .subscribe(() => {
       this.assignToPaymentType(newPayment)            
-      this.getAccountInfo()
+      // this.getAccountInfo()
       });        
     }
 
@@ -131,16 +136,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       }
       pType.Payments.push(payment);
 
-        this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                
-          this.getAccountInfo();
-      });      
-      this.clearControls();
+        this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                          
+          this.clearControls();
+      });            
     }
   
   clearControls(){    
-    this.paymentForm.reset();
-
-    this.getAccountInfo();    
+    this.paymentForm.reset();    
   }  
 
   onChangePaymentType(uptName: string) {

@@ -10,7 +10,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 const APP_ROUTES : Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
-    {path: 'home', component: HomeComponent },
+    {path: 'home', component: HomeComponent },    
+    {path: 'home/:AccountId', component: HomeComponent},
     {path: 'accounts', component: AccountListingComponent },        
     {path: 'accounts/:AccountId', component: AccountDetailComponent},
     {path: 'accounts/new', component: AccountDetailComponent},
