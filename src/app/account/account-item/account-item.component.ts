@@ -1,3 +1,5 @@
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MonthlyPayment } from './../monthly-payments/monthly-payment';
 import { InverterPipe } from './inverter.pipe';
 import { Subscription } from 'rxjs/Subscription';
@@ -6,8 +8,9 @@ import { UserPaymentTypes } from './../UserPaymentTypes';
 import { PaymentTypesService } from './../payment-types/payment-types.service';
 import { Account } from './../Account';
 import { AccountService } from './../account.service';
-import { Component, OnInit, Input, OnChanges, OnDestroy } from '@angular/core';
-import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, Input, OnChanges, OnDestroy, EventEmitter } from '@angular/core';
+import { FormBuilder, FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Observable } from "rxjs/Rx";
 
 @Component({
   selector: 'bb-account-item',
@@ -22,7 +25,7 @@ import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveForm
 export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() accountId: string;
-  account: Account = new Account("", "", 0, false, [], new Array<Payment>(), new Array<Payment>(), 0, false);
+  account: Account = new Account("", "", 0, false, [], new Array<Payment>(), new Array<Payment>(), 0, false);  
   private formBuilder: FormBuilder = new FormBuilder();
   private paymentForm: FormGroup;
   paymentTypes = new Array<UserPaymentTypes>();
@@ -30,41 +33,52 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   remainingFunds = 0;
   showRemaining: boolean = false;
   accMp = new Array<MonthlyPayment>();
+  newPayment: Payment;    
 
   constructor(private accountService: AccountService,
-              private paymentTypeService: PaymentTypesService) {      
-   }  
+              private paymentTypeService: PaymentTypesService) { }  
 
-   ngOnInit(){
+   ngOnInit(){                              
+     this.initForm();
      this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
-        (pt : UserPaymentTypes[]) => {
-           this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                    
-           this.CalculateOutgoings(this.account);
-
-           this.getAccountInfo();                  
+        (pt : UserPaymentTypes[]) => {           
+           this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                                                                
+           this.CalculateOutgoings(this.account);            
+           this.getAccountInfo();
         });                             
-
-        this.initForm();     
+    this.paymentTypeService.fetchAllUserPayments();                                     
    }
 
-   ngOnChanges(){
-     this.getAccountInfo();
-     
+   ngOnChanges(){             
+        //this.getAccountInfo();                                                                
    }
 
    ngOnDestroy() {
      this.subscription.unsubscribe();
    }
 
-   getAccountInfo() {
+    getAccountInfo() {
       if (this.accountId != undefined){
-      this.account = this.accountService.getAccountById(this.accountId);
-
-      this.paymentTypeService.fetchAllUserPayments();
+      this.account = this.accountService.getAccountById(this.accountId);        
       }
-   }   
+   }
+
+   getMonthlyPayments() {     
+     this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId);
+     this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => {       
+       var today = new Date();
+       for (let m of mp) {
+        if (m.NextPaymentDate < today) {
+          var payment = new Payment(m.Name, m.Amount, today, "", false, null);          
+          this.doPayment(payment);
+          m.NextPaymentDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        }
+       }
+     });
+   }
 
    CalculateOutgoings(acc: Account){
+     if (acc == undefined) return;
      acc.TotalFunds = 0;
       if(acc.Outgoings != undefined){
         acc.Outgoings.forEach(
@@ -77,16 +91,15 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    }
 
    initForm(){          
-
      let selPaymentType = "";          
      let name = "";
      let amount = "";
       this.paymentForm = this.formBuilder.group({
-      SelPaymentType: [selPaymentType, Validators.required],                  
+      SelPaymentType: [selPaymentType],                  
       PaymentName: [name, Validators.required],      
       Amount: [amount, Validators.required]
     });
-  }   
+  }     
 
   onSubmit(){
     var newPayment = new Payment(
@@ -99,50 +112,61 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.remainingFunds - newPayment.Amount < 0 && this.showRemaining) {      
         if (confirm('This payment goes over the limit for the selected payment type. Are you sure about this?')) {
-          this.doPayment(newPayment);                    
+          this.addPaymentToAccount(newPayment);                    
         } else {
           this.clearControls();
         }
       } else {
-        this.doPayment(newPayment);
+        this.addPaymentToAccount(newPayment);
       }      
-    }
+    }    
 
-    doPayment(newPayment: Payment){
-    
+    addPaymentToAccount(newPayment : Payment) {
     var paymentType = this.paymentForm.value.SelPaymentType;            
 
     if (paymentType != undefined) {
       newPayment.paymentTypeName = paymentType;
-    } else {
+      } else {
       newPayment.paymentTypeName = 'adhoc';
     }
 
-    this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
-    .subscribe(() => {
-      this.assignToPaymentType(newPayment)            
-      this.getAccountInfo()
-      });        
+    if (this.account.Outgoings == null) {
+      this.account.Outgoings = new Array<Payment>();
+    }
+    this.account.Outgoings.push(newPayment);
     }
 
-    assignToPaymentType(payment: Payment) {
-      var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
+    doPayment(newPayment: Payment){             
+      
+    // this.assignToPaymentType(newPayment).subscribe(() =>
+    // {
+    //   // this.accountService.addNewPayment(newPayment, this.account.AccountId, fuck)
+    //   // .subscribe(() => {      
+    //   //   // this.assignToPaymentType(newPayment);        
+        
+    //   //   this.clearControls();
+    //   //   this.showRemaining = false;        
+    //   //   alert('New payment added!');                
 
-      if (pType.Payments == undefined || pType.Payments == null) {
-        pType.Payments = new Array<Payment>();
-      }
-      pType.Payments.push(payment);
+    //   // });       
+    // });
+    }                        
+    
+    // assignToPaymentType(payment: Payment) {
+    //   var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
 
-        this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                
-          this.getAccountInfo();
-      });      
-      this.clearControls();
-    }
+    //   if (pType != null && (pType.Payments == undefined || pType.Payments == null)) {
+    //     pType.Payments = new Array<Payment>();
+    //   }
+    //   pType.Payments.push(payment);
+
+    //   return this.paymentTypeService.updatePaymentType(pType);
+    // }
   
   clearControls(){    
     this.paymentForm.reset();
 
-    this.getAccountInfo();    
+    //this.getAccountInfo();    
   }  
 
   onChangePaymentType(uptName: string) {
@@ -159,6 +183,10 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.showRemaining = false;
     }
+  }
+
+  onSaveAccount(){
+    alert('saving ' + this.account.Outgoings.length + ' payments');
   }   
 }
 

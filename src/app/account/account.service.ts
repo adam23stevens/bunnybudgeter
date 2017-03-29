@@ -25,6 +25,8 @@ export class AccountService implements OnInit {
   private allAccounts = new Array<Account>();  
   private updatedAccount: Account;  
   public accountsUpdated = new EventEmitter<Account[]>();
+  public paymentsUpdated = new EventEmitter<Payment[]>();
+  public monthlyPaymentsUpdated = new EventEmitter<MonthlyPayment[]>();
 
   constructor(private userService : UserService, private http: Http) { 
     this.currUser = this.userService.getLoggedInUser();        
@@ -111,7 +113,7 @@ export class AccountService implements OnInit {
     .subscribe((data: Account[]) => {      
       this.allAccounts = data;                  
     });                   
-  }
+  }  
 
   // public getFavouriteAccount() {        
   //   return this.getAllUserAccounts().filter(a => a.IsFavourite == true)[0];
@@ -119,6 +121,16 @@ export class AccountService implements OnInit {
 
   public getAllMonthlyPaymentsFromAccount(accountId: string) {
     return this.monthlyPayments.filter(p => p.AccountId == accountId);
+  }
+
+  public getAllMonthlyPaymentsFromAccount2(accountId: string) {    
+    this.http.get('https://bunnybudgeter.firebaseio.com/monthlypayments.json')
+    .map((response: Response) => response.json())
+    .subscribe((monthlyPayment : MonthlyPayment[]) => 
+      {          
+          //this.monthlyPayments = monthlyPayment.filter(mp => mp.AccountId == accountId);
+          this.monthlyPaymentsUpdated.emit(this.monthlyPayments);
+      });
   }
 
   public AddNewMonthlyPayment(newMonthlyPayment: MonthlyPayment) {    
@@ -185,13 +197,13 @@ export class AccountService implements OnInit {
     } 
     if (newPayment.Amount < 0) {
       this.updatedAccount.Income.push(newPayment);
-    }
-
-    return this.EditAccount2(this.updatedAccount, accountId);
+    }    
+    
+    return this.EditAccountNew(this.updatedAccount, accountId);
   }   
 
   
-  public EditAccount2(newAccount: Account, accountId: string) {
+  public EditAccountNew(newAccount: Account, accountId: string) {
     var allAccounts = this.getAccounts();
 
     this.allAccounts[this.allAccounts.indexOf(this.allAccounts.filter(a => a.AccountId === accountId)[0])] = newAccount;
