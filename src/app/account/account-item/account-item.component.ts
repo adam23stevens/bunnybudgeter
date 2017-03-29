@@ -138,14 +138,14 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         pType.Payments = new Array<Payment>();
       }
       pType.Payments.push(payment);
-
+      alert('New payment added!');
         this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                          
           this.clearControls();
           this.router.navigate(['/home']);
       });            
     }
   
-  clearControls(){    
+  clearControls(){        
     this.paymentForm.reset();    
   }  
 

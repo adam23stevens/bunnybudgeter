@@ -34,10 +34,11 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   ngOnInit() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
     //this.subscribeToData();   
+    this.getAllUserAccounts();
     this.accUrlSubscription = this.route.params.subscribe((p : any) => {
       let aId = p['AccountId'];
-      this.getAllUserAccounts(aId);
-    });    
+      this.accountId = aId;            
+    });            
   }
   ngOnChanges() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
@@ -58,15 +59,14 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.paymentTypesService.AddMockPaymentTypes().subscribe(a => alert('mock payment types got'));
   }
 
-  public getAllUserAccounts(accountId) {
+  public getAllUserAccounts() {
     this.subscription = this.accountService.accountsUpdated.subscribe(ac => 
     {
       this.allUserAccounts = ac;
-      if (accountId == null) {
+      if (this.accountId == undefined) {
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
       this.accountId = this.account.AccountId;      
-      } else {
-        this.accountId = accountId;
+    } else {                
         this.account = this.allUserAccounts.filter(ac => ac.AccountId == this.accountId)[0];        
       }
       this.accountIndex = this.allUserAccounts.indexOf(this.account);
