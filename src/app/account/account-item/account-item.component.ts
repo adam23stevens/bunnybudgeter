@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { MonthlyPayment } from './../monthly-payments/monthly-payment';
 import { InverterPipe } from './inverter.pipe';
@@ -35,7 +36,8 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
-              private route: ActivatedRoute) {      
+              private route: ActivatedRoute,
+              private router: Router) {      
    }  
 
    ngOnInit(){    
@@ -139,6 +141,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
         this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                          
           this.clearControls();
+          this.router.navigate(['/home']);
       });            
     }
   

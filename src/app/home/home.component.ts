@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PaymentTypesService } from './../account/payment-types/payment-types.service';
 import { UserService } from './../user/user.service';
 import { Subscription } from 'rxjs/Subscription';
@@ -17,7 +17,8 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   constructor(private accountService: AccountService
               , private userService: UserService
               , private paymentTypesService: PaymentTypesService
-              , private router: Router) { }
+              , private router: Router
+              , private route : ActivatedRoute) { }
 
   private account: Account;
   private accountId;
@@ -25,14 +26,18 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   private allUserAccounts: Array<Account>;
   private accountIndex;
   subscription: Subscription;  
+  accUrlSubscription: Subscription;
   timerSubscription: Subscription;
   devMode = false;
   loggedInUserId = "";  
 
   ngOnInit() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
-    //this.subscribeToData();           
-    this.getAllUserAccounts();
+    //this.subscribeToData();   
+    this.accUrlSubscription = this.route.params.subscribe((p : any) => {
+      let aId = p['AccountId'];
+      this.getAllUserAccounts(aId);
+    });    
   }
   ngOnChanges() {
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
@@ -53,12 +58,17 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.paymentTypesService.AddMockPaymentTypes().subscribe(a => alert('mock payment types got'));
   }
 
-  public getAllUserAccounts() {
+  public getAllUserAccounts(accountId) {
     this.subscription = this.accountService.accountsUpdated.subscribe(ac => 
     {
       this.allUserAccounts = ac;
+      if (accountId == null) {
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
-      this.accountId = this.account.AccountId;
+      this.accountId = this.account.AccountId;      
+      } else {
+        this.accountId = accountId;
+        this.account = this.allUserAccounts.filter(ac => ac.AccountId == this.accountId)[0];        
+      }
       this.accountIndex = this.allUserAccounts.indexOf(this.account);
       this.navigateToAccount();
     });
