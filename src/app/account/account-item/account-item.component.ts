@@ -8,8 +8,9 @@ import { UserPaymentTypes } from './../UserPaymentTypes';
 import { PaymentTypesService } from './../payment-types/payment-types.service';
 import { Account } from './../Account';
 import { AccountService } from './../account.service';
-import { Component, OnInit, Input, OnChanges, OnDestroy, EventEmitter, Output } from '@angular/core';
-import { FormBuilder, FormArray, FormGroup, FormControl,Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, Input, OnChanges, OnDestroy, EventEmitter } from '@angular/core';
+import { FormBuilder, FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Observable } from "rxjs/Rx";
 
 @Component({
   selector: 'bb-account-item',
@@ -32,6 +33,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   remainingFunds = 0;
   showRemaining: boolean = false;
   accMp = new Array<MonthlyPayment>();
+  newPayment: Payment;    
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -54,19 +56,32 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
            });              
    }
 
-   ngOnChanges(){
-     
+   ngOnChanges(){     
    }
 
    ngOnDestroy() {
      this.subscription.unsubscribe();
    }
 
-   getAccountInfo() {     
-      if (this.accountId != null){
-      this.account = this.accountService.getAccountById(this.accountId);                        
+    getAccountInfo() {
+      if (this.accountId != undefined){
+      this.account = this.accountService.getAccountById(this.accountId);        
       }
-   }   
+   }
+
+   getMonthlyPayments() {     
+     this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId);
+     this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => {       
+       var today = new Date();
+       for (let m of mp) {
+        if (m.NextPaymentDate < today) {
+          var payment = new Payment(m.Name, m.Amount, today, "", false, null);          
+          this.doPayment(payment);
+          m.NextPaymentDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+        }
+       }
+     });
+   }
 
    CalculateOutgoings(acc: Account){     
      if (acc == undefined) return;
@@ -82,16 +97,15 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    }
 
    initForm(){          
-
      let selPaymentType = "";          
      let name = "";
      let amount = "";
       this.paymentForm = this.formBuilder.group({
-      SelPaymentType: [selPaymentType, Validators.required],                  
+      SelPaymentType: [selPaymentType],                  
       PaymentName: [name, Validators.required],      
       Amount: [amount, Validators.required]
     });
-  }   
+  }     
 
   onSubmit(){
     var newPayment = new Payment(
@@ -104,34 +118,54 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.remainingFunds - newPayment.Amount < 0 && this.showRemaining) {      
         if (confirm('This payment goes over the limit for the selected payment type. Are you sure about this?')) {
-          this.doPayment(newPayment);                    
+          this.addPaymentToAccount(newPayment);                    
         } else {
           this.clearControls();
         }
       } else {
-        this.doPayment(newPayment);
+        this.addPaymentToAccount(newPayment);
       }      
-    }
+    }    
 
-    doPayment(newPayment: Payment){
-    
+    addPaymentToAccount(newPayment : Payment) {
     var paymentType = this.paymentForm.value.SelPaymentType;            
 
     if (paymentType != undefined) {
       newPayment.paymentTypeName = paymentType;
-    } else {
+      } else {
       newPayment.paymentTypeName = 'adhoc';
     }
 
+    if (this.account.Outgoings == null) {
+      this.account.Outgoings = new Array<Payment>();
+    }
+    this.account.Outgoings.push(newPayment);
+    
     this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
     .subscribe(() => {
       this.assignToPaymentType(newPayment)            
       // this.getAccountInfo()
-      });        
+      });            
     }
+    
+    doPayment(newPayment: Payment){             
+      
+    // this.assignToPaymentType(newPayment).subscribe(() =>
+    // {
+    //   // this.accountService.addNewPayment(newPayment, this.account.AccountId, fuck)
+    //   // .subscribe(() => {      
+    //   //   // this.assignToPaymentType(newPayment);        
+        
+    //   //   this.clearControls();
+    //   //   this.showRemaining = false;        
+    //   //   alert('New payment added!');                
 
-    assignToPaymentType(payment: Payment) {
-      var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
+    //   // });       
+    // });
+    }                        
+    
+     assignToPaymentType(payment: Payment) {
+       var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
 
       if (pType.Payments == undefined || pType.Payments == null) {
         pType.Payments = new Array<Payment>();
@@ -143,10 +177,20 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
           this.router.navigate(['/home']);          
       });            
     }
+    
   
   clearControls(){        
     this.paymentForm.reset();    
-  }  
+
+    //   if (pType != null && (pType.Payments == undefined || pType.Payments == null)) {
+    //     pType.Payments = new Array<Payment>();
+    //   }
+    //   pType.Payments.push(payment);
+
+    //   return this.paymentTypeService.updatePaymentType(pType);
+    // }
+  
+  }
 
   onChangePaymentType(uptName: string) {
     if (uptName != 'adhoc') {
@@ -162,6 +206,10 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     } else {
       this.showRemaining = false;
     }
+  }
+
+  onSaveAccount(){
+    alert('saving ' + this.account.Outgoings.length + ' payments');
   }   
 }
 
