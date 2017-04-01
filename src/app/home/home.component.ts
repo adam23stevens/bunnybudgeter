@@ -62,14 +62,16 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
 
   public getAllUserAccounts() {
     this.subscription = this.accountService.accountsUpdated.subscribe(ac => 
-    {
+    {      
       this.allUserAccounts = ac;
-      // if (this.accountId == undefined) {
+      
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
+      if (this.account == undefined) {
+        this.account = this.allUserAccounts[0];
+      }
+      if (this.account == undefined) return;
       this.accountId = this.account.AccountId;      
-    // } else {                      
-        //this.account = this.allUserAccounts.filter(ac => ac.AccountId == this.accountId)[0];                
-      //}
+    
       this.accountIndex = this.allUserAccounts.indexOf(this.account);
       this.navigateToAccount();
     });

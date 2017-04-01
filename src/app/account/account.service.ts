@@ -73,6 +73,21 @@ export class AccountService implements OnInit {
     });
   }
 
+  public AddNewAccount2(newAccount: Account) {
+    this.allAccounts.push(newAccount);
+
+    newAccount.AccountId = this.allAccounts.indexOf(newAccount).toString();
+    
+      const body = JSON.stringify(this.allAccounts);
+      const headers = new Headers();
+      headers.append('Content-Type','application.json');      
+
+      this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json', body, {headers: headers})
+      .map((data: Response) => data.json())
+      .subscribe(() => alert('New account added successfully'));
+    }
+
+
   public setAllUserAccounts(obj : Account[]) : Subscription {      
     return this.baseFetchAccounts().subscribe(acc => {
         obj = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.currUser.UserId) > -1);

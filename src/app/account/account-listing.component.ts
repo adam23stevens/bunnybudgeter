@@ -18,15 +18,18 @@ export class AccountListingComponent implements OnInit {
              ,private userService: UserService
              ,private router: Router) { }
 
-  accounts: Array<Account>;  
+  accounts = new Array<Account>();
   subscription: Subscription;
 
   ngOnInit() {
     this.subscription = this.accountService.baseFetchAccounts()
     .subscribe(acc => 
-    {
-      this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);                   
+    {                  
+      if (acc == null) return;
+      this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);                               
     });
+
+    
   }
 
   viewAcc(accountId) {

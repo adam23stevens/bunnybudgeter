@@ -27,6 +27,7 @@ export class PaymentTypesComponent implements OnInit {
         this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);                           
         for (let a of this.accounts){
           this.paymentTypeService.baseFetchUserPayments().subscribe(pt => {
+            if (pt == null) return;
             for (let filteredType of pt.filter(p => p.AccountId == a.AccountId)) {
             this.userPaymentTypes.push(filteredType);
             }

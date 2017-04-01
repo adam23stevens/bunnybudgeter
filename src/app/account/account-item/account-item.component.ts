@@ -44,6 +44,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    ngOnInit(){    
      this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
         (pt : UserPaymentTypes[]) => {           
+           if (pt == null) return;
            this.paymentTypes = pt.filter(p => p.AccountId == this.accountId);                                                                                                                                             
         });                                                                                   
         this.urlSubscription = this.route.params.subscribe((p : any) => 
@@ -76,7 +77,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
        for (let m of mp) {
         if (m.NextPaymentDate < today) {
           var payment = new Payment(m.Name, m.Amount, today, "", false, null);          
-          this.doPayment(payment);
+          this.addPaymentToAccount(payment);
           m.NextPaymentDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
         }
        }
@@ -143,57 +144,33 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     
     this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
     .subscribe(() => {
-      this.assignToPaymentType(newPayment)            
-      // this.getAccountInfo()
+      if (newPayment.paymentTypeName != 'adhoc') {
+      this.assignToPaymentType(newPayment)        
+      }
+      alert('New payment added');
+      this.router.navigate(['/home']);        
       });            
-    }
-    
-    doPayment(newPayment: Payment){             
-      
-    // this.assignToPaymentType(newPayment).subscribe(() =>
-    // {
-    //   // this.accountService.addNewPayment(newPayment, this.account.AccountId, fuck)
-    //   // .subscribe(() => {      
-    //   //   // this.assignToPaymentType(newPayment);        
-        
-    //   //   this.clearControls();
-    //   //   this.showRemaining = false;        
-    //   //   alert('New payment added!');                
-
-    //   // });       
-    // });
-    }                        
-    
+    }    
      assignToPaymentType(payment: Payment) {
-       var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
+
+      var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);
 
       if (pType.Payments == undefined || pType.Payments == null) {
         pType.Payments = new Array<Payment>();
       }
-      pType.Payments.push(payment);
-      alert('New payment added!');
+      pType.Payments.push(payment);      
         this.paymentTypeService.updatePaymentType(pType).subscribe(() => {                          
-          this.clearControls();
-          this.router.navigate(['/home']);          
+          this.clearControls();                    
       });            
     }
     
   
   clearControls(){        
     this.paymentForm.reset();    
-
-    //   if (pType != null && (pType.Payments == undefined || pType.Payments == null)) {
-    //     pType.Payments = new Array<Payment>();
-    //   }
-    //   pType.Payments.push(payment);
-
-    //   return this.paymentTypeService.updatePaymentType(pType);
-    // }
-  
   }
 
   onChangePaymentType(uptName: string) {
-    if (uptName != 'adhoc') {
+    if (uptName != 'adhoc') {      
       var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(uptName, this.accountId);
       if (pType != null) {
         this.remainingFunds = pType.MonthlyAllowance;

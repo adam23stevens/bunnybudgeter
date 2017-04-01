@@ -1,4 +1,4 @@
-<div *ngIf="account != null">
+<div *ngIf="!isNew">
     <bb-monthly-payments [accountId]="account.AccountId"></bb-monthly-payments>
 </div>
 <hr>
@@ -26,6 +26,14 @@
                     <div class="form-group">
                         <label for="IsPublic">Make this public?</label>
                         <input type="checkbox" id="IsPublic" class="form-control" formControlName="IsPublic" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="PayDay">Pay day of the month</label>
+                        <input type="number" id="PayDay" class="form-control" formControlName="PayDay" />
                     </div>
                 </div>
             </div>

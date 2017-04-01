@@ -29,9 +29,11 @@ export class MonthlyPaymentsComponent implements OnInit {
     this.subscription = this.accountService.baseFetchMonthlyPayments()
     .subscribe(allMonthlyP =>
     {
+      if (allMonthlyP != null) {
         this.monthlyPayments = allMonthlyP.filter(mp => mp != null ? mp.AccountId == this.accountId && !mp.IsDeleted : "");              
         this.monthlyDebits = this.monthlyPayments.filter(p => p.isCredit == false);
         this.monthlyCredits = this.monthlyPayments.filter(p => p.isCredit == true);
+      }
     });      
   }
 

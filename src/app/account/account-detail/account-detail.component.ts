@@ -37,6 +37,7 @@ export class AccountDetailComponent implements OnInit{
             this.accSubscription = this.accountService.baseFetchAccounts().subscribe(
               a => 
             {
+                if (a == null) return;
                 this.account = a.filter(x => x.AccountId == accountId)[0];                                                
                 this.initForm();                
               }
@@ -47,17 +48,18 @@ export class AccountDetailComponent implements OnInit{
             this.account = new Account("", "", 0, false, [], [], [], 0, false);                    
           }
       });
-      this.initForm();    
+      this.initForm();          
   }
 
   onSubmit(){
     const newAccount = new Account("", this.accountForm.value.AccountName, 0, this.accountForm.value.IsPublic, 
-    new Array<User>(), new Array<Payment>(), new Array<Payment>(), this.accountForm.value.OverdraftLimit, false);
+    new Array<User>(), new Array<Payment>(), new Array<Payment>(), this.accountForm.value.OverdraftLimit, false
+    ,this.accountForm.value.PayDay);
 
     newAccount.ActiveUsers.push(this.userService.getLoggedInUser());    
     
     if (this.isNew) {      
-      this.accountService.AddNewAccount(newAccount);
+      this.accountService.AddNewAccount2(newAccount);
     } else {
       newAccount.AccountId = this.account.AccountId;
       newAccount.IsFavourite = this.account.IsFavourite;
@@ -74,14 +76,16 @@ export class AccountDetailComponent implements OnInit{
     this.accountForm.reset();
   }
 
-  initForm(){    
+  initForm(){        
     let name = this.account != null ? this.account.AccountName : "";
     let odraftLimit = this.account != null ? this.account.OverdraftLimit : "";
     let isPublic = this.account != null ? this.account.IsPublic : "";
+    let payDay = this.account != null && this.account.PayDay != null ? this.account.PayDay : 1;
     this.accountForm = this.formBuilder.group({
       AccountName: [name, Validators.required],
       OverdraftLimit: [odraftLimit, Validators.required],
-      IsPublic: [isPublic, Validators.required]
+      IsPublic: [isPublic, Validators.required],
+      PayDay: [payDay, Validators.required]
     });
   }
   

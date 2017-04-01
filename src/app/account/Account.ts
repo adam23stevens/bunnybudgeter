@@ -11,7 +11,8 @@ export class Account {
         public Income: Array<Payment>, //whether or not it's monthly is handled on paymentType
         public Outgoings: Array<Payment>, //whether it's direct debit or general budgeted or even outgone, handled on payment type        
         public OverdraftLimit: number,
-        public IsFavourite: boolean        
+        public IsFavourite: boolean,
+        public PayDay?: number //needed to be able to work out when to calculate things from        
         //public WantedItems: Array<Payment> //phase 2
     ) {}
 }
