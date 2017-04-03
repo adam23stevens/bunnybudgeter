@@ -12,13 +12,15 @@
         <div class="panel-body">
             <div class="panel panel-success" *ngFor="let mC of monthlyCredits">
                 <div class="panel-heading">
-                    {{mC.Name}} - {{mC.Amount | currency:'GBP':1.2-2}} - {{mC.NextPaymentDate}}
+                    {{mC.Name}} - {{mC.Amount | currency:'GBP':1.2-2}} - next due: {{mC.NextPaymentDate}}
                     <button class="btn btn-default" style="float:right; display:inline; padding: 0px 2px 0px 2px;" [routerLink]="['monthlypayment',mC.MonthlyPaymentId]" routerActiveLink="active">edit</button>
                     <button class="btn btn-danger" style="float:right; display:inline; padding: 0px 2px 0px 2px;" (click)="onDelete(mC.MonthlyPaymentId)">del</button>
                 </div>
                 <div class=" panel-body ">
                     <ul *ngFor="let p of mC.Payments ">
-                        <li>{{p.Amount | currency:'GBP':1.2-2}} - {{p.Date}}</li>
+                        <div *ngIf="!p.isPending">
+                            <li>{{p.Amount | currency:'GBP':1.2-2}} on {{p.Date}}</li>
+                        </div>
                     </ul>
                 </div>
             </div>
@@ -33,13 +35,18 @@
         <div class="panel-body ">
             <div class="panel panel-danger " *ngFor="let mD of monthlyDebits ">
                 <div class="panel-heading ">
-                    {{mD.Name}} - {{mD.Amount | currency:'GBP':1.2-2 }}
+                    <div class="row" style="display:inline;">
+                        {{mD.Name}} - {{mD.Amount | currency:'GBP':1.2-2 }}
+                    </div>
+                    <div class="row" style="display:inline;">Next due: {{mD.NextPaymentDate | date :'dd/MM/yy'}} </div>
                     <button class="btn btn-default" style="float:right; display:inline; padding: 0px 2px 0px 2px;" [routerLink]="['monthlypayment',mD.MonthlyPaymentId]" routerActiveLink="active">edit</button>
                     <button class="btn btn-danger" style="float:right; display:inline; padding: 0px 2px 0px 2px;" (click)="onDelete(mD.MonthlyPaymentId)">del</button>
                 </div>
                 <div class="panel-body ">
-                    <ul *ngFor="let p of mD.Payments ">
-                        <li>{{p.Amount | currency:'GBP':1.2-2}} - {{p.Date}}</li>
+                    <ul *ngFor="let p of mD.Payments">
+                        <div *ngIf="!p.isPending">
+                            <li>{{p.Amount | currency:'GBP':1.2-2}} on {{p.Date}}</li>
+                        </div>
                     </ul>
                 </div>
             </div>

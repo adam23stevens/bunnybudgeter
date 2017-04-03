@@ -150,7 +150,7 @@ export class AccountService implements OnInit {
 
   public AddNewMonthlyPayment(newMonthlyPayment: MonthlyPayment) {    
     this.baseFetchMonthlyPayments().subscribe(mp => {        
-      this.monthlyPayments = mp;
+      this.monthlyPayments = mp == null ? new Array<MonthlyPayment>() : mp;      
       this.monthlyPayments.push(newMonthlyPayment);
 
       newMonthlyPayment.MonthlyPaymentId = this.monthlyPayments.indexOf(newMonthlyPayment).toString();      

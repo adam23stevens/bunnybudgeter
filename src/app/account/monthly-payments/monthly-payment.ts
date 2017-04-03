@@ -6,6 +6,7 @@ export class MonthlyPayment {
     constructor(        
         public Name : string,        
         public NextPaymentDate: Date,
+        public DayOfMonth: number,
         public isCredit: boolean,
         public AccountId: string,
         public Payments: Array<Payment>,

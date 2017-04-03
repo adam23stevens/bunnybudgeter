@@ -43,7 +43,7 @@ export class MonthlyPaymentsEditComponent implements OnInit {
             });                    
         } else {
           this.isNew = true;   
-          this.monthlyPayment = new MonthlyPayment("", new Date(), false, this.accountId, new Array<Payment>(), 0, false);
+          this.monthlyPayment = new MonthlyPayment("", new Date(), 0, false, this.accountId, new Array<Payment>(), 0, false);
         }
       }
     )
@@ -52,12 +52,12 @@ export class MonthlyPaymentsEditComponent implements OnInit {
 
   initForm(){
     let name = this.monthlyPayment == undefined ? "" : this.monthlyPayment.Name;
-    let date = this.monthlyPayment == undefined ? "" : this.monthlyPayment.NextPaymentDate;
+    let day = this.monthlyPayment == undefined ? "" : this.monthlyPayment.DayOfMonth;
     let isCredit = this.monthlyPayment == undefined ? "" : this.monthlyPayment.isCredit;
     let amount = this.monthlyPayment == undefined ? "" : this.monthlyPayment.Amount;    
     this.monthlyPaymentForm = this.formBuilder.group({
       Name: [name, Validators.required],
-      Date: [date, Validators.required],
+      Day: [day, Validators.required],
       IsCredit: [isCredit],
       Amount: [amount, Validators.required]
     });
@@ -67,17 +67,33 @@ export class MonthlyPaymentsEditComponent implements OnInit {
   //   return this.accountService.getPaymentFromMonthlyPaymentRec(this.monthlyPayment.MonthlyPaymentId);
   // }
 
+  calcNextDate(day : number) {
+    var d = new Date();
+    var thisDate = new Date();
+    thisDate.setDate(day);
+    if (thisDate < d) {
+      thisDate.setMonth(thisDate.getMonth() + 1);      
+    }
+    alert(thisDate);
+    return thisDate;
+  }
+
   onSubmit(){
     var name = this.monthlyPaymentForm.value.Name;
-    var date = this.monthlyPaymentForm.value.Date;
+    var day = this.monthlyPaymentForm.value.Day;
     var isCredit = this.monthlyPaymentForm.value.IsCredit;
     var amount = this.monthlyPaymentForm.value.Amount;
-    
-    var pment = new Payment(name, amount, date, "", true);
-    var newMonthlyPayment = new MonthlyPayment(name, date, isCredit, this.accountId, this.monthlyPayment.Payments, amount, false);
+    var date = new Date();
+
+    date = this.calcNextDate(day);
+    //turn this into the proper date
+
+    var pment = new Payment(name, amount, date , "", true);
+    var newMonthlyPayment = new MonthlyPayment(name, date, day, isCredit, this.accountId, this.monthlyPayment.Payments, amount, false);
     
     if (this.isNew) {
     newMonthlyPayment.Payments = new Array<Payment>();
+    newMonthlyPayment.Payments.push(pment);
     this.accountService.AddNewMonthlyPayment(newMonthlyPayment);    
   } else {
       newMonthlyPayment.MonthlyPaymentId = this.monthlyPayment.MonthlyPaymentId;      
