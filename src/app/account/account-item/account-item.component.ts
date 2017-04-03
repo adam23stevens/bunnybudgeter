@@ -51,8 +51,9 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
            {                          
              this.accountId = p['AccountId'];
              this.getAccountInfo();
+             this.getMonthlyPayments();
              this.CalculateOutgoings(this.account);             
-             this.paymentTypeService.fetchAllUserPayments();
+             this.paymentTypeService.fetchAllUserPayments();             
              this.initForm();
            });              
    }
@@ -72,13 +73,21 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
    getMonthlyPayments() {     
      this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId);
-     this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => {       
+     this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => { 
+
        var today = new Date();
-       for (let m of mp) {
-        if (m.NextPaymentDate < today) {
-          var payment = new Payment(m.Name, m.Amount, today, "", false, null);          
+       for (let m of mp) {        
+         var date =  new Date(m.Payments[m.Payments.length -1].Date);
+        if (date < today) {
+          m.Payments[m.Payments.length -1].isPending = false;          
+          var payment = m.Payments[m.Payments.length -1];          
           this.addPaymentToAccount(payment);
-          m.NextPaymentDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+
+          var nextPayDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+          m.Payments.push(new Payment(payment.Name, payment.Amount, nextPayDate, "", true));     
+          m.NextPaymentDate = nextPayDate;
+          this.accountService.EditMonthlyPayment(m, m.MonthlyPaymentId);
+          alert('Monthly payment taken for ' + payment.Name);                
         }
        }
      });
@@ -141,7 +150,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       this.account.Outgoings = new Array<Payment>();
     }
     this.account.Outgoings.push(newPayment);
-    
+        
     this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
     .subscribe(() => {
       if (newPayment.paymentTypeName != 'adhoc') {

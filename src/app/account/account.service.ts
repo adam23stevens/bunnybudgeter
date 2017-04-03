@@ -142,8 +142,11 @@ export class AccountService implements OnInit {
     this.http.get('https://bunnybudgeter.firebaseio.com/monthlypayments.json')
     .map((response: Response) => response.json())
     .subscribe((monthlyPayment : MonthlyPayment[]) => 
-      {          
+      {                                     
+        //alert(monthlyPayment.length);
           //this.monthlyPayments = monthlyPayment.filter(mp => mp.AccountId == accountId);
+          this.monthlyPayments = monthlyPayment;          
+          //alert(this.monthlyPayments.length);
           this.monthlyPaymentsUpdated.emit(this.monthlyPayments);
       });
   }
