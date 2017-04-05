@@ -22,6 +22,7 @@ import { InverterPipe } from './account/account-item/inverter.pipe';
 import { AccountPaymentsComponent } from './account/account-item/account-payments.component';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,7 +36,7 @@ import { AccountPaymentsComponent } from './account/account-item/account-payment
     HomeComponent,
     MonthlyPaymentsEditComponent,
     InverterPipe,
-    AccountPaymentsComponent
+    AccountPaymentsComponent    
   ],
   imports: [
     BrowserModule,

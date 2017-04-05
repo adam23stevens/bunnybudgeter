@@ -6,7 +6,8 @@ import { Payment } from './../Payment';
     Amount: 2000,
     Date: new Date('23/02/2017'),
     Notes: '',        
-    isPending: true
+    isPending: true,
+    isCredit: true
 }
 
 const SalaryIncomeJ: Payment = {
@@ -14,7 +15,8 @@ const SalaryIncomeJ: Payment = {
     Amount: 2000,
     Date: new Date('27/02/2017'),
     Notes: '',        
-    isPending: false
+    isPending: false,
+    isCredit: true
 }
 
  const BonusIncome: Payment = {
@@ -22,7 +24,8 @@ const SalaryIncomeJ: Payment = {
     Amount: 1000,
     Date: new Date('20/12/2016'),
     Notes: '',        
-    isPending: false
+    isPending: false,
+    isCredit: true
 }
 
  const rentPayment: Payment = {
@@ -30,7 +33,8 @@ const SalaryIncomeJ: Payment = {
     Amount: 900,
     Date: new Date('01/03/2017'),
     Notes: '',        
-    isPending: false
+    isPending: false,
+    isCredit: false
 }
 
  const foodPayment : Payment = {
@@ -38,7 +42,8 @@ const SalaryIncomeJ: Payment = {
     Amount: 80,
     Date: new Date('01/04/2017'),
     Notes: '',        
-    isPending: false
+    isPending: false,
+    isCredit: false
 }
 
  const fuelPayment: Payment = {
@@ -46,7 +51,8 @@ const SalaryIncomeJ: Payment = {
     Amount: 42.50,
     Date: new Date('01/03/2017'),
     Notes: '',        
-    isPending: false
+    isPending: false,
+    isCredit: false
 }
 
  const catFoodPayment: Payment = {
@@ -54,7 +60,8 @@ const SalaryIncomeJ: Payment = {
     Amount: 8.50,
     Date: new Date('01/03/2017'),
     Notes: '',    
-    isPending: false
+    isPending: false,
+    isCredit: false
 }
 
 const beerPayment: Payment = {
@@ -62,7 +69,8 @@ const beerPayment: Payment = {
     Amount: 13.50,
     Date: new Date('03/04/17'),
     Notes: '',        
-    isPending: false
+    isPending: false,
+    isCredit: false
 }
 
 const councilTaxPayment: Payment = {
@@ -70,7 +78,8 @@ const councilTaxPayment: Payment = {
     Amount: 148.12,
     Date: new Date('01/03/17'),
     Notes: '',    
-    isPending: false
+    isPending: false,
+    isCredit: false
 }
 
 export const mockPayments = [SalaryIncome, SalaryIncomeJ, BonusIncome, rentPayment, foodPayment, fuelPayment, catFoodPayment, beerPayment, councilTaxPayment];

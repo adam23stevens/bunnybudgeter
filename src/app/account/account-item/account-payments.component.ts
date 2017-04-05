@@ -11,14 +11,9 @@ import { Observable } from "rxjs/Rx";
 })
 export class AccountPaymentsComponent implements OnInit, OnChanges {
 
-  @Input() Outgoings; 
-  @Input() Income;
-  @Input() teststrings;
-  constructor(private accountService : AccountService) { }
+  @Input() Transactions: Payment[];   
 
-  outgoingSubs;
-  incomeSubs;
-  timerSubscription;
+  constructor(private accountService : AccountService) { }  
 
   ngOnInit() {}
   ngOnChanges() {}

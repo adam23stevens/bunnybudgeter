@@ -7,9 +7,8 @@ const accountA : Account = {
     AccountName: "Adam's Smile account",
     TotalFunds: 340,
     IsPublic: false,
-    ActiveUsers: [mockUsers[0]],
-    Income: [mockPayments[0], mockPayments[2]],
-    Outgoings: [mockPayments[3], mockPayments[4], mockPayments[5], mockPayments[6]],
+    ActiveUsers: [mockUsers[0]],    
+    Transactions: [mockPayments[3], mockPayments[4], mockPayments[5], mockPayments[6]],
     OverdraftLimit: 2000,
     IsFavourite: true
 }
@@ -19,9 +18,8 @@ const accountJ : Account = {
     AccountName: "Julia's Natwest account",
     TotalFunds: 1043,
     IsPublic: false,
-    ActiveUsers: [mockUsers[1]],
-    Income: [mockPayments[1]],
-    Outgoings: [mockPayments[3]],
+    ActiveUsers: [mockUsers[1]],    
+    Transactions: [mockPayments[3]],
     OverdraftLimit: 1000,
     IsFavourite: false
 }
@@ -31,9 +29,8 @@ const accountJoint : Account = {
     AccountName: "Natwest Joint Account",
     TotalFunds: 450,
     IsPublic: true,
-    ActiveUsers: [mockUsers[0], mockUsers[1]],
-    Income: [mockPayments[0], mockPayments[1]],
-    Outgoings: [mockPayments[4], mockPayments[5]],
+    ActiveUsers: [mockUsers[0], mockUsers[1]],    
+    Transactions: [mockPayments[4], mockPayments[5]],
     OverdraftLimit: 100,
     IsFavourite: false
 }

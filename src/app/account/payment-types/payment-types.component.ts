@@ -41,13 +41,13 @@ export class PaymentTypesComponent implements OnInit {
     
   }
 
-  onAdd(name: string, amount: string, accountId: string) {  
+  onAdd(name: string, amount: string, isCredit: boolean, accountId: string) {      
     var upt = new UserPaymentTypes();
     upt.AccountId = accountId;
     upt.Name = name;
     upt.MonthlyAllowance = parseInt(amount);
     upt.IsAdhoc = true;
-    upt.IsCredit = false;
+    upt.IsCredit = isCredit;
     upt.Payments = new Array<Payment>();
 
     this.userPaymentTypes.push(upt);    

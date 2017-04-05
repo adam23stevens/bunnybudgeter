@@ -24,7 +24,7 @@ import { Observable } from "rxjs/Rx";
 })
 export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {    
   accountId; 
-  account: Account = new Account("", "", 0, false, [], new Array<Payment>(), new Array<Payment>(), 0, false);
+  account: Account = new Account("", "", 0, false, [], new Array<Payment>(), 0, false);
   private formBuilder: FormBuilder = new FormBuilder();
   private paymentForm: FormGroup;
   paymentTypes = new Array<UserPaymentTypes>();
@@ -33,7 +33,9 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   remainingFunds = 0;
   showRemaining: boolean = false;
   accMp = new Array<MonthlyPayment>();
-  newPayment: Payment;    
+  newPayment: Payment;
+  paymentIsCredit: boolean;    
+  paymentIsCreditEnable: boolean;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -41,7 +43,9 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
               private router: Router) {      
    }  
 
-   ngOnInit(){    
+   ngOnInit(){
+     this.paymentIsCredit = false;    
+     this.paymentIsCreditEnable = true;
      this.subscription = this.paymentTypeService.OnPaymentTypesChanged.subscribe(
         (pt : UserPaymentTypes[]) => {           
            if (pt == null) return;
@@ -81,10 +85,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         if (date <= today) {
           m.Payments[m.Payments.length -1].isPending = false;          
           var payment = m.Payments[m.Payments.length -1];          
-          this.addPaymentToAccount(payment);
-
+          if (m.isCredit) {            
+            this.addPaymentToAccount(payment, true);
+          } else {            
+            this.addPaymentToAccount(payment, false);
+          }
           var nextPayDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
-          m.Payments.push(new Payment(payment.Name, payment.Amount, nextPayDate, "", true));     
+          m.Payments.push(new Payment(payment.Name, payment.Amount, nextPayDate, "", true, m.isCredit));     
           m.NextPaymentDate = nextPayDate;
           this.accountService.EditMonthlyPayment(m, m.MonthlyPaymentId);
           alert('Monthly payment taken for ' + payment.Name);                
@@ -96,14 +103,12 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    CalculateOutgoings(acc: Account){     
      if (acc == undefined) return;
      acc.TotalFunds = 0;
-      if(acc.Outgoings != undefined){
-        acc.Outgoings.forEach(
+      if(acc.Transactions != undefined){
+        acc.Transactions.filter(t => !t.isCredit).forEach(
           o => acc.TotalFunds -= o.isPending ? 0 : o.Amount);
-      }
-      if (acc.Income != undefined){
-        acc.Income.forEach(
-          i => acc.TotalFunds += i.isPending ? 0 : i.Amount);
-      }
+        acc.Transactions.filter(t => t.isCredit).forEach(
+          i => acc.TotalFunds += i.isPending ? 0 : i.Amount);        
+      }      
    }
 
    initForm(){          
@@ -123,21 +128,22 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       this.paymentForm.value.Amount,
       new Date(),
       '',      
-      false
+      false,
+      this.paymentIsCredit
     );    
 
-    if (this.remainingFunds - newPayment.Amount < 0 && this.showRemaining) {      
+    if (this.remainingFunds - newPayment.Amount < 0 && this.showRemaining && !this.paymentIsCredit) {      
         if (confirm('This payment goes over the limit for the selected payment type. Are you sure about this?')) {
-          this.addPaymentToAccount(newPayment);                    
+          this.addPaymentToAccount(newPayment, this.paymentIsCredit);                    
         } else {
           this.clearControls();
         }
       } else {
-        this.addPaymentToAccount(newPayment);
+        this.addPaymentToAccount(newPayment, this.paymentIsCredit);
       }      
     }    
 
-    addPaymentToAccount(newPayment : Payment) {
+    addPaymentToAccount(newPayment : Payment, isCredit : boolean) {
     var paymentType = this.paymentForm.value.SelPaymentType;            
 
     if (paymentType != undefined) {
@@ -146,12 +152,12 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       newPayment.paymentTypeName = 'adhoc';
     }
 
-    if (this.account.Outgoings == null) {
-      this.account.Outgoings = new Array<Payment>();
+    if (this.account.Transactions == null) {
+      this.account.Transactions = new Array<Payment>();
     }
-    this.account.Outgoings.push(newPayment);
+    this.account.Transactions.push(newPayment);
         
-    this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType)
+    this.accountService.addNewPayment(newPayment, this.account.AccountId, paymentType, isCredit)
     .subscribe(() => {
       if (newPayment.paymentTypeName != 'adhoc') {
       this.assignToPaymentType(newPayment)        
@@ -181,22 +187,21 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   onChangePaymentType(uptName: string) {
     if (uptName != 'adhoc') {      
       var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(uptName, this.accountId);
-      if (pType != null) {
+      if (pType != null) {        
         this.remainingFunds = pType.MonthlyAllowance;
-
-        this.showRemaining = true;
+        this.paymentIsCredit = pType.IsCredit;
+        this.paymentIsCreditEnable = false;
+        
+        this.showRemaining = !pType.IsCredit;
         if (pType.Payments != null) {
           pType.Payments.forEach(p => this.remainingFunds -= p.Amount);
         }
       }
     } else {
       this.showRemaining = false;
+      this.paymentIsCreditEnable = true;
     }
-  }
-
-  onSaveAccount(){
-    alert('saving ' + this.account.Outgoings.length + ' payments');
-  }   
+  }  
 }
 
 

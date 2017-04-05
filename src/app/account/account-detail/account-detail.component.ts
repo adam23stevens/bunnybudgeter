@@ -45,7 +45,7 @@ export class AccountDetailComponent implements OnInit{
           }                            
 
           if(this.account == null){
-            this.account = new Account("", "", 0, false, [], [], [], 0, false);                    
+            this.account = new Account("", "", 0, false, [], [], 0, false);                    
           }
       });
       this.initForm();          
@@ -53,7 +53,7 @@ export class AccountDetailComponent implements OnInit{
 
   onSubmit(){
     const newAccount = new Account("", this.accountForm.value.AccountName, 0, this.accountForm.value.IsPublic, 
-    new Array<User>(), new Array<Payment>(), new Array<Payment>(), this.accountForm.value.OverdraftLimit, false
+    new Array<User>(), new Array<Payment>(), this.accountForm.value.OverdraftLimit, false
     ,this.accountForm.value.PayDay);
 
     newAccount.ActiveUsers.push(this.userService.getLoggedInUser());    
@@ -63,12 +63,9 @@ export class AccountDetailComponent implements OnInit{
     } else {
       newAccount.AccountId = this.account.AccountId;
       newAccount.IsFavourite = this.account.IsFavourite;
-      if (this.account.Outgoings != null) {
-        newAccount.Outgoings = this.account.Outgoings;
-      } 
-      if (this.account.Income != null) {
-        newAccount.Income = this.account.Income;
-      }
+      if (this.account.Transactions != null) {
+        newAccount.Transactions = this.account.Transactions;
+      }       
       
       this.accountService.EditAccount(newAccount, this.account.AccountId);
     }    

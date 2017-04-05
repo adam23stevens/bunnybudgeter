@@ -201,21 +201,12 @@ export class AccountService implements OnInit {
     // mockMonthlyPayments.splice(mockMonthlyPayments.indexOf(mpayment), 1);
   }  
 
-  public addNewPayment(newPayment: Payment, accountId: string, userTypeName: string){
+  public addNewPayment(newPayment: Payment, accountId: string, userTypeName: string, isCredit : boolean){
     this.updatedAccount = this.getAccountById(accountId);
-    if (this.updatedAccount.Outgoings == null) {
-      this.updatedAccount.Outgoings = new Array<Payment>();
+    if (this.updatedAccount.Transactions == null) {
+      this.updatedAccount.Transactions = new Array<Payment>();
     }
-    if (this.updatedAccount.Income == null) {
-      this.updatedAccount.Income = new Array<Payment>();
-    }
-    
-    if (newPayment.Amount > 0) {
-      this.updatedAccount.Outgoings.push(newPayment);
-    } 
-    if (newPayment.Amount < 0) {
-      this.updatedAccount.Income.push(newPayment);
-    }    
+    this.updatedAccount.Transactions.push(newPayment);
     
     return this.EditAccountNew(this.updatedAccount, accountId);
   }   

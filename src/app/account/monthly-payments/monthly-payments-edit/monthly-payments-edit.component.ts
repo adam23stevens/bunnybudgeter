@@ -88,7 +88,7 @@ export class MonthlyPaymentsEditComponent implements OnInit {
     date = this.calcNextDate(day);
     //turn this into the proper date
 
-    var pment = new Payment(name, amount, date , "", true);
+    var pment = new Payment(name, amount, date , "", true, isCredit);
     var newMonthlyPayment = new MonthlyPayment(name, date, day, isCredit, this.accountId, this.monthlyPayment.Payments, amount, false);
     
     if (this.isNew) {
