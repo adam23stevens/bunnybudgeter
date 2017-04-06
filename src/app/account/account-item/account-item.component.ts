@@ -103,16 +103,16 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
      });
    }
 
-   CalculateOutgoings(acc: Account){     
-     if (acc == undefined) return;
-     acc.TotalFunds = 0;
-      if(acc.Transactions != undefined){
-        acc.Transactions.filter(t => !t.isCredit).forEach(
-          o => acc.TotalFunds -= o.isPending ? 0 : o.Amount);
-        acc.Transactions.filter(t => t.isCredit).forEach(
-          i => acc.TotalFunds += i.isPending ? 0 : i.Amount);              
+   CalculateOutgoings(){     
+     if (this.account == undefined) return;
+     this.account.TotalFunds = 0;
+      if(this.account.Transactions != undefined){
+        this.account.Transactions.filter(t => !t.isCredit).forEach(
+          o => this.account.TotalFunds -= o.isPending ? 0 : o.Amount);
+        this.account.Transactions.filter(t => t.isCredit).forEach(
+          i => this.account.TotalFunds = i.isPending ? 0 : parseInt(this.account.TotalFunds.toString()) + parseInt(i.Amount.toString()));
       }      
-      this.totalFundsWithOverdraft = acc.TotalFunds + acc.OverdraftLimit;
+      this.totalFundsWithOverdraft = parseInt(this.account.TotalFunds.toString()) + parseInt(this.account.OverdraftLimit.toString());
    }
 
    initForm(){          
