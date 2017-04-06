@@ -57,7 +57,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
              this.accountId = p['AccountId'];
              this.getAccountInfo();
              this.getMonthlyPayments();
-             this.CalculateOutgoings(this.account);             
+             this.CalculateOutgoings();             
              this.paymentTypeService.fetchAllUserPayments();             
              this.initForm();
            });              
