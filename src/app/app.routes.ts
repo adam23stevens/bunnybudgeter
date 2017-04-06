@@ -1,3 +1,4 @@
+import { LandingComponent } from './home/landing.component';
 import { authGuard } from './user/auth/authGuard.service';
 import { SigninComponent } from './user/auth/signin/signin.component';
 import { SignupComponent } from './user/auth/signup/signup.component';
@@ -13,6 +14,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 const APP_ROUTES : Routes = [
     {path: '', redirectTo: '/home', pathMatch: 'full'},
+    {path: 'landing', component: LandingComponent},
     {path: 'home', component: HomeComponent },    
     {path: 'home/:AccountId', component: HomeComponent, canActivate: [authGuard]},
     {path: 'signup', component: SignupComponent},

@@ -94,7 +94,7 @@ export class AccountService implements OnInit {
 
   public setAllUserAccounts(obj : Account[]) : Subscription {      
     return this.baseFetchAccounts().subscribe(acc => {
-        obj = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.currUser.UserId) > -1);
+        obj = acc.filter(a => a.ActiveUsers.findIndex(i => i == this.userService.getAuthUserId()) > -1);
     });  
   }
 
@@ -107,7 +107,7 @@ export class AccountService implements OnInit {
     this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token)    
     .map((response: Response) =>  response.json())
     .subscribe((acc : Account[]) => {
-      this.allAccounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);
+      this.allAccounts = acc.filter(a => a.ActiveUsers.findIndex(i => i == this.userService.getAuthUserId()) > -1);
       this.accountsUpdated.emit(this.allAccounts);
     });
   }  

@@ -16,7 +16,9 @@ export class UserService {
   }
 
   public getAuthUserId(){
+    if (firebase.auth().currentUser != null) {
     return firebase.auth().currentUser.uid;
+    }
   }
 
   public getAllUsers() {
@@ -50,7 +52,7 @@ export class UserService {
     if (firebase.auth().currentUser != null)
     firebase.auth().currentUser.getToken().then((tk: string) => this.token = tk);
     return this.token;
-  }
+  }  
 
   isAuthenticated(){
     return this.token != null;

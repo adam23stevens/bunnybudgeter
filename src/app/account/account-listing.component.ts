@@ -26,7 +26,7 @@ export class AccountListingComponent implements OnInit {
     .subscribe(acc => 
     {                  
       if (acc == null) return;
-      this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);                               
+      this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i == this.userService.getAuthUserId()) > -1);                               
     });
 
     

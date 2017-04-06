@@ -24,6 +24,7 @@ import { MonthlyPaymentsEditComponent } from './account/monthly-payments/monthly
 import { InverterPipe } from './account/account-item/inverter.pipe';
 import { AccountPaymentsComponent } from './account/account-item/account-payments.component';
 import { CommonModule } from '@angular/common';
+import { LandingComponent } from './home/landing.component';
 
 
 @NgModule({
@@ -41,7 +42,8 @@ import { CommonModule } from '@angular/common';
     InverterPipe,
     AccountPaymentsComponent,
     SignupComponent,
-    SigninComponent
+    SigninComponent,
+    LandingComponent
   ],
   imports: [
     BrowserModule,

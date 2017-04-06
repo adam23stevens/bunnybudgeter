@@ -24,7 +24,7 @@ export class PaymentTypesComponent implements OnInit {
   ngOnInit() {    
     this.subscription = this.accountService.baseFetchAccounts().subscribe(
       acc => {
-        this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i.UserId == this.userService.getLoggedInUser().UserId) > -1);                           
+        this.accounts = acc.filter(a => a.ActiveUsers.findIndex(i => i == this.userService.getAuthUserId()) > -1);                           
         for (let a of this.accounts){
           this.paymentTypeService.baseFetchUserPayments().subscribe(pt => {
             if (pt == null) return;

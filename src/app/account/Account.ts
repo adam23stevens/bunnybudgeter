@@ -7,7 +7,7 @@ export class Account {
         public AccountName: string,
         public TotalFunds: number,
         public IsPublic: boolean,
-        public ActiveUsers: Array<User>,
+        public ActiveUsers: Array<string>,
         //public Income: Array<Payment>, //whether or not it's monthly is handled on paymentType
         public Transactions: Array<Payment>, //whether it's direct debit or general budgeted or even outgone, handled on payment type        
         public OverdraftLimit: number,

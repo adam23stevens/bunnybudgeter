@@ -32,6 +32,11 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   loggedInUserId = "";  
 
   ngOnInit() {
+    if (!this.userService.isAuthenticated()) {
+      alert('fuck off');
+      this.router.navigate(['/landing']);
+    }
+
     this.loggedInUserId = this.userService.getLoggedInUser().UserId;          
     //this.subscribeToData();   
     this.getAllUserAccounts();

@@ -36,6 +36,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   newPayment: Payment;
   paymentIsCredit: boolean;    
   paymentIsCreditEnable: boolean;
+  totalFundsWithOverdraft: number;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -107,8 +108,9 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         acc.Transactions.filter(t => !t.isCredit).forEach(
           o => acc.TotalFunds -= o.isPending ? 0 : o.Amount);
         acc.Transactions.filter(t => t.isCredit).forEach(
-          i => acc.TotalFunds += i.isPending ? 0 : i.Amount);        
+          i => acc.TotalFunds += i.isPending ? 0 : i.Amount);              
       }      
+      this.totalFundsWithOverdraft = acc.TotalFunds + acc.OverdraftLimit;
    }
 
    initForm(){          

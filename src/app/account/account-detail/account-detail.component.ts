@@ -53,10 +53,10 @@ export class AccountDetailComponent implements OnInit{
 
   onSubmit(){
     const newAccount = new Account("", this.accountForm.value.AccountName, 0, this.accountForm.value.IsPublic, 
-    new Array<User>(), new Array<Payment>(), this.accountForm.value.OverdraftLimit, false
+    new Array<string>(), new Array<Payment>(), this.accountForm.value.OverdraftLimit, false
     ,this.accountForm.value.PayDay);
 
-    newAccount.ActiveUsers.push(this.userService.getLoggedInUser());    
+    newAccount.ActiveUsers.push(this.userService.getAuthUserId());    
     
     if (this.isNew) {      
       this.accountService.AddNewAccount2(newAccount);

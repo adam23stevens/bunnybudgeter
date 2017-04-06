@@ -2,7 +2,14 @@
     <div class="panel panel-success">
         <div class="panel-heading" style="padding-bottom: 100px;">
             <b>{{account?.AccountName}}</b><br>
-            <i>Currently available: {{account?.TotalFunds | currency:'GBP':1.2-2}}</i>
+            <div class="list-group">
+                <div class="list-item">
+                    <i>Currently available:</i> <i><b>{{account?.TotalFunds | currency:'GBP':1.2-2}}</b></i>
+                </div>
+                <div class="list-item" *ngIf="account?.OverdraftLimit > 0">
+                    <i>With Overdraft:</i> <i><b>{{totalFundsWithOverdraft | currency:'GBP':1.2-2}}</b></i>
+                </div>
+            </div>
             <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
                 <div class="row">
                     <div class="col-xs-12">
