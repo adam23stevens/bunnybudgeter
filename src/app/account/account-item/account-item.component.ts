@@ -77,9 +77,11 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
    }
 
    getMonthlyPayments() {     
-     this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId);
-     this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => { 
-
+     this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId).subscribe(
+       (mp: MonthlyPayment[]) => {
+    //  )
+    //  this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => { 
+       if (mp == null) return; 
        var today = new Date();
        for (let m of mp) {        
          var date =  new Date(m.Payments[m.Payments.length -1].Date);
@@ -153,7 +155,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       } else {
       newPayment.paymentTypeName = 'adhoc';
     }
-
+    if (this.account == undefined) return;
     if (this.account.Transactions == null) {
       this.account.Transactions = new Array<Payment>();
     }
