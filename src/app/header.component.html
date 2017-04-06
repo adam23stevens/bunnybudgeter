@@ -9,11 +9,15 @@
                 <img src='./bunnypng.png' alt=" bunny ">
                 <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu <span class="caret"></span></a>-->
                 <ul class="dropdown-menu">
-                    <li routerLinkActive="active"><a [routerLink]="['/home']">Home</a></li>
-                    <li routerLinkActive="active"><a [routerLink]="['/accounts']">My Accounts</a></li>
-                    <li routerLinkActive="active"><a [routerLink]="['/paymentTypes']">My Payment Types</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li class="dropdown-header">My Settings</li>
+                    <li *ngIf="userService.isAuthenticated()" routerLinkActive="active"><a [routerLink]="['/home']">Home</a></li>
+                    <li *ngIf="userService.isAuthenticated()" routerLinkActive="active"><a [routerLink]="['/accounts']">My Accounts</a></li>
+                    <li *ngIf="userService.isAuthenticated()" routerLinkActive="active"><a [routerLink]="['/paymentTypes']">My Payment Types</a></li>
+                    <li *ngIf="userService.isAuthenticated()" role="separator" class="divider"></li>
+
+                    <li *ngIf="!userService.isAuthenticated()"><a [routerLink]="['/signin']">Sign in</a></li>
+                    <li *ngIf="!userService.isAuthenticated()"><a [routerLink]="['/signup']">Sign up</a></li>
+
+                    <li *ngIf="userService.isAuthenticated()" class="dropdown-header" (click)="onLogOut()">Log out</li>
                 </ul>
             </li>
             <!--<li class="navbar-toggle collapsed" style="display:inline; left:0;">

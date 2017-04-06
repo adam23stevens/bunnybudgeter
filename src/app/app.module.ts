@@ -1,3 +1,7 @@
+import { authGuard } from './user/auth/authGuard.service';
+import { SigninComponent } from './user/auth/signin/signin.component';
+import { SignupComponent } from './user/auth/signup/signup.component';
+import { UserService } from './user/user.service';
 import { MonthlyPaymentsComponent } from './account/monthly-payments/monthly-payments.component';
 import { PaymentTypesService } from './account/payment-types/payment-types.service';
 import { routing } from './app.routes';
@@ -6,7 +10,6 @@ import { AccountService } from './account/account.service';
 import { PaymentTypesComponent } from './account/payment-types/payment-types.component';
 import { AccountDetailComponent } from './account/account-detail/account-detail.component';
 import { AccountItemComponent } from './account/account-item/account-item.component';
-import { UserModule } from './user/user.module';
 import { AccountListingComponent } from './account/account-listing.component';
 //import { AccountModule } from './account/account.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -20,7 +23,7 @@ import { HomeComponent } from './home/home.component';
 import { MonthlyPaymentsEditComponent } from './account/monthly-payments/monthly-payments-edit/monthly-payments-edit.component';
 import { InverterPipe } from './account/account-item/inverter.pipe';
 import { AccountPaymentsComponent } from './account/account-item/account-payments.component';
-
+import { CommonModule } from '@angular/common';
 
 
 @NgModule({
@@ -36,17 +39,18 @@ import { AccountPaymentsComponent } from './account/account-item/account-payment
     HomeComponent,
     MonthlyPaymentsEditComponent,
     InverterPipe,
-    AccountPaymentsComponent    
+    AccountPaymentsComponent,
+    SignupComponent,
+    SigninComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule, 
-    UserModule,        
+    HttpModule,           
     routing,
     ReactiveFormsModule
   ],
-  providers: [AccountService, PaymentTypesService],
+  providers: [AccountService, PaymentTypesService, UserService, authGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
