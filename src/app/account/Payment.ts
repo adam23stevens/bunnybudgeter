@@ -10,7 +10,7 @@ export class Payment{
         public Notes: string,
         //public monthlyPayment: MonthlyPayment, This shouldn't be needed as payments are held as an array in monthly payment        ,
         public isPending: boolean, // if this is true, then it only exists as mark up to be charged at a later date
-        public isCredit : boolean,
+        public isCredit : boolean,        
         public paymentTypeName? : string
     ) {}
 }

@@ -37,6 +37,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   paymentIsCredit: boolean;    
   paymentIsCreditEnable: boolean;
   totalFundsWithOverdraft: number;
+  paymentCutOffDate: Date;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -103,8 +104,9 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
      });
    }
 
-   CalculateOutgoings(){     
+   CalculateOutgoings(){          
      if (this.account == undefined) return;
+    
      this.account.TotalFunds = 0;
       if(this.account.Transactions != undefined){
         this.account.Transactions.filter(t => !t.isCredit).forEach(
@@ -197,22 +199,30 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         this.paymentIsCreditEnable = false;
         
         this.showRemaining = !pType.IsCredit;
-        if (pType.Payments != null) {
-          pType.Payments.forEach(p => this.remainingFunds -= p.Amount);
+
+        //set the day of the month to the new date
+        //if this is in the past then a okay
+        //if it's in the future then take a month off.
+        var today = new Date();
+        this.paymentCutOffDate = new Date(today.getFullYear(), today.getMonth(), this.account.PayDay);
+        this.paymentCutOffDate.setDate(this.account.PayDay);
+        if (today <= this.paymentCutOffDate) {
+          this.paymentCutOffDate = new Date(today.getFullYear(), today.getMonth() -1, this.account.PayDay);
+        }                
+        if (pType.Payments != null) {          
+          pType.Payments.forEach(p =>
+          {
+            var thisDate = new Date(p.Date);
+            if (thisDate >= this.paymentCutOffDate)
+            this.remainingFunds -= p.Amount;
+          }
+          );      
         }
       }
-    } else {
+      }   else {
       this.showRemaining = false;
       this.paymentIsCreditEnable = true;
     }
-  }  
+  } 
 }
-
-
-
-
-
-
-
-
-
+  
