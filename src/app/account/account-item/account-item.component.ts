@@ -38,6 +38,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   paymentIsCreditEnable: boolean;
   totalFundsWithOverdraft: number;
   paymentCutOffDate: Date;
+  Warning: string = "";
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -112,9 +113,12 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         this.account.Transactions.filter(t => !t.isCredit).forEach(
           o => this.account.TotalFunds -= o.isPending ? 0 : o.Amount);
         this.account.Transactions.filter(t => t.isCredit).forEach(
-          i => this.account.TotalFunds = i.isPending ? 0 : parseInt(this.account.TotalFunds.toString()) + parseInt(i.Amount.toString()));
+          i => this.account.TotalFunds = i.isPending ? 0 : parseFloat(this.account.TotalFunds.toString()) + parseFloat(i.Amount.toString()));
       }      
-      this.totalFundsWithOverdraft = parseInt(this.account.TotalFunds.toString()) + parseInt(this.account.OverdraftLimit.toString());
+      this.totalFundsWithOverdraft = parseFloat(this.account.TotalFunds.toString()) + parseFloat(this.account.OverdraftLimit.toString());
+
+      //calculate the remaining funds with the payment types and check if you have enough money to cover all of them here
+
    }
 
    initForm(){          
@@ -191,6 +195,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   onChangePaymentType(uptName: string) {
+    this.Warning = "";
     if (uptName != 'adhoc') {      
       var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(uptName, this.accountId);
       if (pType != null) {        
@@ -214,9 +219,17 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
           {
             var thisDate = new Date(p.Date);
             if (thisDate >= this.paymentCutOffDate)
-            this.remainingFunds -= p.Amount;
+            this.remainingFunds = this.remainingFunds - p.Amount >= 0 ? 
+            this.remainingFunds -= p.Amount :
+            0;
           }
-          );      
+          );
+          if (parseFloat(this.account.TotalFunds.toString()) +
+           parseFloat(this.account.OverdraftLimit.toString()) < parseFloat(this.remainingFunds.toString()))
+          {
+            this.showRemaining = false;
+            this.Warning = 'Warning! you have gone over budget and cannot afford any more for this payment type. Please use adhoc payment';     
+          }
         }
       }
       }   else {
