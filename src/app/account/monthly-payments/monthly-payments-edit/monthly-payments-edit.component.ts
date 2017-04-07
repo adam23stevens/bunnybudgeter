@@ -73,8 +73,7 @@ export class MonthlyPaymentsEditComponent implements OnInit {
     thisDate.setDate(day);
     if (thisDate < d) {
       thisDate.setMonth(thisDate.getMonth() + 1);      
-    }
-    alert(thisDate);
+    }    
     return thisDate;
   }
 
