@@ -9,7 +9,7 @@
                 <div *ngIf="p.paymentTypeName != null" class="panel-heading">
                     ({{p.paymentTypeName}}) - {{p.Name}}
                 </div>
-                <div *ngIf="p.paymentTypeName == null" class="panel-heading">
+                <div *ngIf="p.paymentTypeName == ''" class="panel-heading">
                     {{p.Name}}
                     <i style="display:inline; float: right;">{{p.Date | date}}</i>
                 </div>
@@ -20,10 +20,10 @@
         </div>
         <div *ngIf="p.isCredit == false" class="panel panel-danger">
             <div *ngIf="!p.isPending">
-                <div *ngIf="p.paymentTypeName != null" class="panel-heading">
+                <div *ngIf="p.paymentTypeName != ''" class="panel-heading">
                     ({{p.paymentTypeName}}) - {{p.Name}}
                 </div>
-                <div *ngIf="p.paymentTypeName == null" class="panel-heading">
+                <div *ngIf="p.paymentTypeName == ''" class="panel-heading">
                     {{p.Name}}
                     <i style="display:inline; float: right;">{{p.Date | date}}</i>
                 </div>
