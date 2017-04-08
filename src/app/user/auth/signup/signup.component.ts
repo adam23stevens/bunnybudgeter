@@ -17,8 +17,16 @@ export class SignupComponent implements OnInit {
   onSignUp(form: NgForm) {
     const email = form.value.email;
     const password = form.value.password;
+    const passwordConfirm = form.value.passwordConfirm;
+
+    if (password != passwordConfirm) {
+      alert('Your passwords do not match');
+      form.reset();      
+    }
+    else {
     //create user object - insert to database and set the ID?
     this.userService.signUpUser(email, password);
+    }
   }
 
 }

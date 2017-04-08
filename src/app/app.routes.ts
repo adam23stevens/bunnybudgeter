@@ -18,7 +18,7 @@ const APP_ROUTES : Routes = [
     {path: 'home', component: HomeComponent },    
     {path: 'home/:AccountId', component: HomeComponent, canActivate: [authGuard]},
     {path: 'signup', component: SignupComponent},
-    {path: 'signin', component: SigninComponent},
+    // {path: 'signin', component: SigninComponent},
     {path: 'accounts', component: AccountListingComponent},        
     {path: 'accounts/:AccountId', component: AccountDetailComponent, canActivate: [authGuard]},
     {path: 'accounts/new', component: AccountDetailComponent, canActivate: [authGuard]},
