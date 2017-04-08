@@ -1,3 +1,4 @@
+import { DataService } from './data.service';
 import { authGuard } from './user/auth/authGuard.service';
 import { SigninComponent } from './user/auth/signin/signin.component';
 import { SignupComponent } from './user/auth/signup/signup.component';
@@ -52,7 +53,7 @@ import { LandingComponent } from './home/landing.component';
     routing,
     ReactiveFormsModule
   ],
-  providers: [AccountService, PaymentTypesService, UserService, authGuard],
+  providers: [AccountService, PaymentTypesService, UserService, authGuard, DataService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

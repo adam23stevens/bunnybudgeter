@@ -1,3 +1,4 @@
+import { DataService } from './../../data.service';
 import { UserService } from './../../user/user.service';
 import { Http, Headers, Response } from "@angular/http";
 import { PaymentType } from './../PaymentType';
@@ -12,10 +13,11 @@ export class PaymentTypesService implements OnInit {
   private userPayments: Array<UserPaymentTypes> = mockUserPaymentTypes;  
   allPaymentTypes = new Array<UserPaymentTypes>();
   OnPaymentTypesChanged = new EventEmitter<UserPaymentTypes[]>();
-  constructor(private http: Http, private userService : UserService) { }
+  dataUrl = "";
+  constructor(private http: Http, private userService : UserService, private dataService : DataService) { }
 
   ngOnInit(){
-    this.fetchAllUserPayments();
+    this.fetchAllUserPayments();    
   }
 
   getAllPaymentTypesForAccount(accountId: string){
@@ -28,7 +30,7 @@ export class PaymentTypesService implements OnInit {
     const headers = new Headers();
     headers.append('Content-Type', 'application.json');
 
-    return this.http.put('https://bunnybudgeter.firebaseio.com/paymenttypes.json?auth=' + token, body, {headers: headers})
+    return this.http.put(this.dataService.getAccessUrl() + 'paymenttypes.json?auth=' + token, body, {headers: headers})
     .map((data: Response) => data.json());   
   }
 
@@ -38,7 +40,7 @@ export class PaymentTypesService implements OnInit {
     const headers = new Headers();
     headers.append('Content-Type', 'application.json');
 
-    return this.http.put('https://bunnybudgeter.firebaseio.com/paymenttypes.json?auth=' + token, body, {headers: headers})
+    return this.http.put(this.dataService.getAccessUrl() + 'paymenttypes.json?auth=' + token, body, {headers: headers})
     .map((data: Response) => data.json());   
   }
 
@@ -52,13 +54,13 @@ export class PaymentTypesService implements OnInit {
 
   public baseFetchUserPayments() :Observable<UserPaymentTypes[]> {
     const token = this.userService.getTokener();
-    return this.http.get('https://bunnybudgeter.firebaseio.com/paymenttypes.json?auth=' + token)    
+    return this.http.get(this.dataService.getAccessUrl() + 'paymenttypes.json?auth=' + token)    
     .map((response: Response) =>  response.json());    
   }  
 
   public fetchAllUserPayments() {
     const token = this.userService.getTokener();
-    return this.http.get('https://bunnybudgeter.firebaseio.com/paymenttypes.json?auth=' + token)    
+    return this.http.get(this.dataService.getAccessUrl() + 'paymenttypes.json?auth=' + token)    
     .map((response: Response) =>  response.json())
     .subscribe(pt => 
     {

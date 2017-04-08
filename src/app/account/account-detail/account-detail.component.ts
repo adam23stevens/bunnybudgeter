@@ -52,7 +52,7 @@ export class AccountDetailComponent implements OnInit{
   }
 
   onSubmit(){
-    const newAccount = new Account("", this.accountForm.value.AccountName, 0, this.accountForm.value.IsPublic, 
+    const newAccount = new Account("", this.accountForm.value.AccountName, 0, false, 
     [], new Array<Payment>(), this.accountForm.value.OverdraftLimit, false
     ,this.accountForm.value.PayDay);
 

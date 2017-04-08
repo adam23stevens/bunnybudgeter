@@ -1,3 +1,4 @@
+import { DataService } from './../data.service';
 import { MonthlyPayment } from './monthly-payments/monthly-payment';
 import { Subscription } from 'rxjs/Subscription';
 import { UserPaymentTypes } from './UserPaymentTypes';
@@ -26,13 +27,14 @@ export class AccountService implements OnInit {
   public accountsUpdated = new EventEmitter<Account[]>();
   public paymentsUpdated = new EventEmitter<Payment[]>();
   public monthlyPaymentsUpdated = new EventEmitter<MonthlyPayment[]>();
+  dataUrl = "";
 
-  constructor(private userService : UserService, private http: Http) { 
+  constructor(private userService : UserService, private dataService: DataService, private http: Http) { 
     this.currUser = this.userService.getLoggedInUser();        
   }  
   
   ngOnInit() {
-    this.fetchAccounts();
+    this.fetchAccounts();    
   }
 
   public AddMockAccounts() {
@@ -49,9 +51,9 @@ export class AccountService implements OnInit {
     const token = this.userService.getTokener();
     const body = mockMonthlyPayments;
     const headers = new Headers();
-    headers.append('Content-Type', 'application.json');
+    headers.append('Content-Type', 'application.json');    
 
-    return this.http.put('https://bunnybudgeter.firebaseio.com/monthlypayments.json?auth=' + token, body, {headers: headers})
+    return this.http.put(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token, body, {headers: headers})
     .map((data: Response) => data.json());   
   }
 
@@ -69,7 +71,7 @@ export class AccountService implements OnInit {
       const headers = new Headers();
       headers.append('Content-Type','application.json');      
 
-      this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token, body, {headers: headers})
+      this.http.put(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
       .subscribe(() => alert('New account added successfully'));
     });
@@ -83,9 +85,8 @@ export class AccountService implements OnInit {
     
       const body = JSON.stringify(this.allAccounts);
       const headers = new Headers();
-      headers.append('Content-Type','application.json');      
-
-      this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token, body, {headers: headers})
+      headers.append('Content-Type','application.json');            
+      this.http.put(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
       .subscribe(() => alert('New account added successfully'));
     }
@@ -103,7 +104,7 @@ export class AccountService implements OnInit {
 
   public getAllUserAccounts(){
     const token = this.userService.getTokener();
-    this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token)    
+    this.http.get(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token)    
     .map((response: Response) =>  response.json())
     .subscribe((acc : Account[]) => {
       this.allAccounts = acc.filter(a => a.ActiveUsers.findIndex(i => i == this.userService.getAuthUserId()) > -1);
@@ -118,19 +119,19 @@ export class AccountService implements OnInit {
 
   public baseFetchAccounts() :Observable<Account[]> {
     const token = this.userService.getTokener();
-    return this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token)    
+    return this.http.get(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token)    
     .map((response: Response) =>  response.json());    
   }  
 
   public baseFetchMonthlyPayments() : Observable<MonthlyPayment[]> {
     const token = this.userService.getTokener();
-    return this.http.get('https://bunnybudgeter.firebaseio.com/monthlypayments.json?auth=' + token)
+    return this.http.get(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token)
     .map((response: Response) => response.json());
   }
 
   public fetchAccounts() {      
     const token = this.userService.getTokener();
-    this.http.get('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token)
+    this.http.get(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token)
     .map((response: Response) => this.allAccounts = response.json())
     .subscribe((data: Account[]) => {      
       this.allAccounts = data;                  
@@ -147,7 +148,7 @@ export class AccountService implements OnInit {
 
   public getAllMonthlyPaymentsFromAccount2(accountId: string) {    
     const token = this.userService.getTokener();
-    return this.http.get('https://bunnybudgeter.firebaseio.com/monthlypayments.json?auth=' + token)
+    return this.http.get(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token)
     .map((response: Response) => response.json())
     // .subscribe((monthlyPayment : MonthlyPayment[]) => 
     //   {                                     
@@ -171,7 +172,7 @@ export class AccountService implements OnInit {
       const headers = new Headers();
       headers.append('Content-Type','application.json');      
 
-      this.http.put('https://bunnybudgeter.firebaseio.com/monthlypayments.json?auth=' + token, body, {headers: headers})
+      this.http.put(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
       .subscribe(() => alert('New monthly payment added successfully'));      
     });            
@@ -188,7 +189,7 @@ export class AccountService implements OnInit {
       const headers = new Headers();
       headers.append('Content-Type', 'application.json');
 
-      this.http.put('https://bunnybudgeter.firebaseio.com/monthlypayments.json?auth=' + token, body, {headers: headers})
+      this.http.put(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
       .subscribe(() => alert('done'));          
     });
@@ -231,7 +232,7 @@ export class AccountService implements OnInit {
     headers.append('Content-Type', 'application.json');
     
     if (token !=undefined) 
-    return this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token, body, {headers: headers})
+    return this.http.put(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())      
   }
 
@@ -246,14 +247,14 @@ export class AccountService implements OnInit {
     const headers = new Headers();
     headers.append('Content-Type', 'application.json');
 
-    this.http.put('https://bunnybudgeter.firebaseio.com/accounts.json?auth=' + token, body, {headers: headers})
+    this.http.put(this.dataUrl + 'accounts.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
       .subscribe(() => alert('Account edited successfully'));    
   }
 
   fetchPayments(){
     const token = this.userService.getTokener();
-    return this.http.get('https://bunnybudgeter.firebaseio.com/payments.json?auth=' + token)
+    return this.http.get(this.dataUrl + 'payments.json?auth=' + token)
     .map(response => response.json());
   }  
 
