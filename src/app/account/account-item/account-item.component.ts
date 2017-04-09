@@ -11,6 +11,7 @@ import { AccountService } from './../account.service';
 import { Component, OnInit, Input, OnChanges, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormArray, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from "rxjs/Rx";
+import { isNumber } from "util";
 
 @Component({
   selector: 'bb-account-item',
@@ -133,6 +134,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   }     
 
   onSubmit(){
+
+    if (!isNumber(this.paymentForm.value.Amount)){
+      alert('Invalid amount entered - please try again');
+      this.paymentForm.reset();
+      return;
+    }
+
     var newPayment = new Payment(
       this.paymentForm.value.PaymentName,
       this.paymentForm.value.Amount,
@@ -171,11 +179,12 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     .subscribe(() => {
       if (newPayment.paymentTypeName != 'adhoc') {
       this.assignToPaymentType(newPayment)        
-      }
-      alert('New payment added');
-      this.router.navigate(['/home']);        
-      });            
-    }    
+    }      
+    this.router.navigate(['/home']);    
+    });
+      alert('New payment added');                       
+    } 
+
      assignToPaymentType(payment: Payment) {
 
       var pType : UserPaymentTypes = this.paymentTypeService.getPaymentTypeByNameAndAccountId(payment.paymentTypeName, this.accountId);

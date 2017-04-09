@@ -4,31 +4,41 @@
 
 <div *ngIf="Transactions?.length > 0">
     <div *ngFor="let p of Transactions | inverter">
-        <div *ngIf="p.isCredit == true" class="panel panel-success">
+        <div *ngIf="p.isCredit == true">
             <div *ngIf="!p.isPending">
-                <div *ngIf="p.paymentTypeName != null" class="panel-heading">
-                    ({{p.paymentTypeName}}) - {{p.Name}}
-                </div>
-                <div *ngIf="p.paymentTypeName == ''" class="panel-heading">
-                    {{p.Name}}
-                    <i style="display:inline; float: right;">{{p.Date | date}}</i>
-                </div>
-                <div class="panel-body">
-                    {{p.Amount | currency:'GBP':1.2-2}} - {{p.Date | date : 'medium' : 'enGb'}}
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <div *ngIf="p.paymentTypeName != ''">
+                            ({{p.paymentTypeName}}) - {{p.Name}}
+                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                        </div>
+                        <div *ngIf="p.paymentTypeName == ''">
+                            {{p.Name}}
+                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        {{p.Amount | currency:'GBP':1.2-2}}
+                    </div>
                 </div>
             </div>
         </div>
-        <div *ngIf="p.isCredit == false" class="panel panel-danger">
+        <div *ngIf="p.isCredit == false">
             <div *ngIf="!p.isPending">
-                <div *ngIf="p.paymentTypeName != ''" class="panel-heading">
-                    ({{p.paymentTypeName}}) - {{p.Name}}
-                </div>
-                <div *ngIf="p.paymentTypeName == ''" class="panel-heading">
-                    {{p.Name}}
-                    <i style="display:inline; float: right;">{{p.Date | date}}</i>
-                </div>
-                <div class="panel-body">
-                    {{p.Amount | currency:'GBP':1.2-2}} - {{p.Date | date : 'medium' : 'enGb'}}
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                        <div *ngIf="p.paymentTypeName != ''">
+                            ({{p.paymentTypeName}}) - {{p.Name}}
+                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                        </div>
+                        <div *ngIf="p.paymentTypeName == ''">
+                            {{p.Name}}
+                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        {{p.Amount | currency:'GBP':1.2-2}}
+                    </div>
                 </div>
             </div>
         </div>

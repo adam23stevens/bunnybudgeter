@@ -5,7 +5,8 @@ export class DataService {
 
   constructor() { }
 
-  dbType = "test";  
+  //dbType = "test";  
+  dbType = "dev";
 
   public getAccessUrl(){
     return 'https://bunnybudgeter.firebaseio.com/' + this.dbType + '/';
