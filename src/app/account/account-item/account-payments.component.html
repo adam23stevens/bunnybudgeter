@@ -9,12 +9,12 @@
                 <div class="panel panel-success">
                     <div class="panel-heading">
                         <div *ngIf="p.paymentTypeName != ''">
-                            ({{p.paymentTypeName}}) - {{p.Name}}
-                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                            <b>({{p.paymentTypeName}}) - {{p.Name}}</b> <br>
+                            <i>{{p.Date | date : 'medium' : 'enGb'}}</i>
                         </div>
                         <div *ngIf="p.paymentTypeName == ''">
-                            {{p.Name}}
-                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                            <b>{{p.Name}}</b><br>
+                            <i>{{p.Date | date : 'medium' : 'enGb'}}</i>
                         </div>
                     </div>
                     <div class="panel-body">
@@ -28,12 +28,12 @@
                 <div class="panel panel-danger">
                     <div class="panel-heading">
                         <div *ngIf="p.paymentTypeName != ''">
-                            ({{p.paymentTypeName}}) - {{p.Name}}
-                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                            <b>({{p.paymentTypeName}}) - {{p.Name}}</b> <br>
+                            <i>{{p.Date | date : 'medium' : 'enGb'}}</i>
                         </div>
                         <div *ngIf="p.paymentTypeName == ''">
-                            {{p.Name}}
-                            <i style="display:inline; float: right;">{{p.Date | date : 'medium' : 'enGb'}}</i>
+                            <b>{{p.Name}}</b> <br>
+                            <i>{{p.Date | date : 'medium' : 'enGb'}}</i>
                         </div>
                     </div>
                     <div class="panel-body">
