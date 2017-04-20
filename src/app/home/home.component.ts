@@ -30,6 +30,7 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
   timerSubscription: Subscription;
   devMode = false;
   loggedInUserId = "";  
+  showArrows: boolean = false;
 
   ngOnInit() {
     if (!this.userService.isAuthenticated()) {      
@@ -68,7 +69,7 @@ export class HomeComponent implements OnInit, OnChanges, OnDestroy {
     this.subscription = this.accountService.accountsUpdated.subscribe(ac => 
     {      
       this.allUserAccounts = ac;
-      
+      this.showArrows = this.allUserAccounts.length > 1;
       this.account = this.allUserAccounts.filter(ac => ac.IsFavourite == true)[0];
       if (this.account == undefined) {
         this.account = this.allUserAccounts[0];

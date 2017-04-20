@@ -3,9 +3,9 @@
     <p>Use the accounts menu at the top to start!</p>
 </div>
 
-<div class="form-group">
-    <button style="font-size: 10px;" class="btn btn-primary" (click)="previousAccount()"><</button>
-    <button style="font-size: 10px;" class="btn btn-primary" (click)="nextAccount()">></button>
+<div class="form-group" *ngIf="showArrows">
+    <button style="font-size: 10px;" class="btn btn-default" (click)="previousAccount()"><</button>
+    <button style="font-size: 10px; float:right;" class="btn btn-default" (click)="nextAccount()">></button>
 </div>
 
 <div *ngIf="devMode">
