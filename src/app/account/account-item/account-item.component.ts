@@ -38,8 +38,10 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   paymentIsCredit: boolean;    
   paymentIsCreditEnable: boolean;
   totalFundsWithOverdraft: number;
+  totalFundsAfterMonthlyPayments: number;
   paymentCutOffDate: Date;
   Warning: string = "";
+  nextPayDate = new Date();
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -86,16 +88,25 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     //  this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => { 
        if (mp == null) return; 
        var today = new Date();
-       for (let m of mp) {        
-         var date =  new Date(m.Payments[m.Payments.length -1].Date);
+       for (let m of mp) {    
+
+         var date =  new Date(m.Payments[m.Payments.length -1].Date);       
+         var minusDates = 0;
+         if (date.getDay() == 0){ //this is a sunday
+          minusDates = 2;
+         }
+         else if (date.getDay() == 6) { //this is a saturday
+           minusDates = 1;
+         }
+                  
+        date.setDate(date.getDate() - minusDates);  
+
         if (date <= today) {
-          m.Payments[m.Payments.length -1].isPending = false;          
+          m.Payments[m.Payments.length -1].isPending = false;                    
           var payment = m.Payments[m.Payments.length -1];          
           if (m.isCredit) {            
-            this.addPaymentToAccount(payment, true);
-          } else {            
-            this.addPaymentToAccount(payment, false);
-          }
+            this.addPaymentToAccount(payment, m.isCredit);
+          } 
           var nextPayDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
           m.Payments.push(new Payment(payment.Name, payment.Amount, nextPayDate, "", true, m.isCredit));     
           m.NextPaymentDate = nextPayDate;
@@ -104,7 +115,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         }
        }
      });
-   }
+   }   
 
    CalculateOutgoings(){          
      if (this.account == undefined) return;
@@ -116,9 +127,25 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         this.account.Transactions.filter(t => t.isCredit).forEach(
           i => this.account.TotalFunds = i.isPending ? 0 : parseFloat(this.account.TotalFunds.toString()) + parseFloat(i.Amount.toString()));
       }      
-      this.totalFundsWithOverdraft = parseFloat(this.account.TotalFunds.toString()) + parseFloat(this.account.OverdraftLimit.toString());
-
+      this.totalFundsWithOverdraft = parseFloat(this.account.TotalFunds.toString()) + parseFloat(this.account.OverdraftLimit.toString());  
+      this.totalFundsAfterMonthlyPayments = this.totalFundsWithOverdraft;              
       //calculate the remaining funds with the payment types and check if you have enough money to cover all of them here
+
+      this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId).subscribe(
+       (mp: MonthlyPayment[]) => {
+         var today = new Date();
+         var mPayDay = new Date(today.getFullYear(), today.getMonth(), this.account.PayDay);
+         if (today <= mPayDay) {
+           this.nextPayDate = mPayDay;
+         } else {
+           this.nextPayDate = new Date(mPayDay.getFullYear(), mPayDay.getMonth() + 1, mPayDay.getDate());
+         }
+         for (let m of mp) {
+           if (m.NextPaymentDate < this.nextPayDate) {
+             this.totalFundsAfterMonthlyPayments -= m.Amount;
+           }
+         }
+       });
 
    }
 

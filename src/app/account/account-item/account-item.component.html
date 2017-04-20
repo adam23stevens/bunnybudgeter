@@ -4,10 +4,13 @@
             <b>{{account?.AccountName}}</b><br>
             <div class="list-group">
                 <div class="list-item">
-                    <i>Currently available:</i> <i><b>{{account?.TotalFunds | currency:'GBP':1.2-2}}</b></i>
+                    <i>Currently remaining: </i> <i><b>{{account?.TotalFunds | currency:'GBP':1.2-2}}</b></i>
                 </div>
                 <div class="list-item" *ngIf="account?.OverdraftLimit > 0">
-                    <i>With Overdraft:</i> <i><b>{{totalFundsWithOverdraft | currency:'GBP':1.2-2}}</b></i>
+                    <i>With Overdraft: </i> <i><b>{{totalFundsWithOverdraft | currency:'GBP':1.2-2}}</b></i>
+                </div>
+                <div class="list-item">
+                    <i>After remaining monthly payments: </i><i><b>{{totalFundsAfterMonthlyPayments | currency:'GBP':1.2-2}}</b></i>
                 </div>
             </div>
             <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
