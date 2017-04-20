@@ -71,6 +71,7 @@ export class MonthlyPaymentsEditComponent implements OnInit {
     var d = new Date();
     var thisDate = new Date();
     thisDate.setDate(day);
+    thisDate.setHours(1,0,0,0);
     if (thisDate < d) {
       thisDate.setMonth(thisDate.getMonth() + 1);      
     }    
@@ -96,6 +97,9 @@ export class MonthlyPaymentsEditComponent implements OnInit {
     this.accountService.AddNewMonthlyPayment(newMonthlyPayment);    
   } else {
       newMonthlyPayment.MonthlyPaymentId = this.monthlyPayment.MonthlyPaymentId;      
+      if (newMonthlyPayment.Payments.length > 0) {
+        newMonthlyPayment.Payments[newMonthlyPayment.Payments.length -1].Date = date;
+      }
       this.accountService.EditMonthlyPayment(newMonthlyPayment, this.monthlyPayment.MonthlyPaymentId);
     }        
   }

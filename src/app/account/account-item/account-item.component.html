@@ -1,55 +1,76 @@
-<div class="row">
-    <div class="panel panel-success">
-        <div class="panel-heading" style="padding-bottom: 100px;">
-            <b>{{account?.AccountName}}</b><br>
-            <div class="list-group">
-                <div class="list-item">
-                    <i>Currently remaining: </i> <i><b>{{account?.TotalFunds | currency:'GBP':1.2-2}}</b></i>
-                </div>
-                <div class="list-item" *ngIf="account?.OverdraftLimit > 0">
-                    <i>With Overdraft: </i> <i><b>{{totalFundsWithOverdraft | currency:'GBP':1.2-2}}</b></i>
-                </div>
-                <div class="list-item">
-                    <i>After remaining monthly payments: </i><i><b>{{totalFundsAfterMonthlyPayments | currency:'GBP':1.2-2}}</b></i>
-                </div>
-            </div>
-            <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="form-group">
-                            <label for="PaymentTypes">Payment Type</label>
-                            <select formControlName="SelPaymentType" id="SelPaymentType" #paymentType [value]="adhoc" (change)="onChangePaymentType($event.target.value)">
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <b>{{account?.AccountName}}</b><br>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="text-align: center;">
+                        Account Balance
+                    </th>
+                    <th style="text-align: center;">
+                        Including Overdraft
+                    </th>
+                    <th style="text-align: center;">
+                        Including Monthly Payments
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="text-align: center;">
+                        <i>{{account?.TotalFunds | currency:'GBP':1.2-2}}</i>
+                    </td>
+                    <td style="text-align: center;">
+                        <i>{{totalFundsWithOverdraft | currency:'GBP':1.2-2}}</i>
+                    </td>
+                    <td style="text-align: center;">
+                        <b>{{totalFundsAfterMonthlyPayments | currency:'GBP':1.2-2}}</b>
+                    </td>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="panel panel-success">
+    <div class="panel-heading" style="padding-bottom: 100px;">
+        <b>Make new payment</b>
+        <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label for="PaymentTypes">Payment Type</label>
+                        <select class="form-control" formControlName="SelPaymentType" id="SelPaymentType" #paymentType [value]="adhoc" (change)="onChangePaymentType($event.target.value)">
                                     <option value="adhoc">Adhoc</option>
                                     <option *ngFor="let type of paymentTypes" [value]="type.Name">
                                     {{type.Name}}
                                     </option>
                             </select>
-                            <div *ngIf="showRemaining">
-                                Remaining for this payment type: {{remainingFunds | currency:'GBP':1.2-2}}
-                            </div>
-                            <div style="color: #aa2222">
-                                <b>{{Warning}}</b>
-                            </div>
-                            <div>
-                                <label for="Amount">Amount</label>
-                                <input placeholder="£0.00" type="number" step=".01" id="amount" class="form-control" formControlName="Amount">
-                            </div>
-                            <div>
-                                <label for="PaymentName">Name</label>
-                                <input type="text" id="name" class="form-control" formControlName="PaymentName">
-                            </div>
-                            <div>
-                                <label for="paymentIsCredit">Credited?</label>
-                                <input type="checkbox" class="form-control" [disabled]="!paymentIsCreditEnable" [checked]="paymentIsCredit" (change)="paymentIsCredit = !paymentIsCredit">
-                            </div>
+                        <div *ngIf="showRemaining">
+                            Remaining for this payment type: {{remainingFunds | currency:'GBP':1.2-2}}
+                        </div>
+                        <div style="color: #aa2222">
+                            <b>{{Warning}}</b>
+                        </div>
+                        <div>
+                            <label for="Amount">Amount</label>
+                            <input placeholder="£0.00" type="number" step=".01" id="amount" class="form-control" formControlName="Amount">
+                        </div>
+                        <div>
+                            <label for="PaymentName">Name</label>
+                            <input type="text" id="name" class="form-control" formControlName="PaymentName">
+                        </div>
+                        <div>
+                            <label for="paymentIsCredit">Credited?</label>
+                            <input type="checkbox" class="form-control" [disabled]="!paymentIsCreditEnable" [checked]="paymentIsCredit" (change)="paymentIsCredit = !paymentIsCredit">
                         </div>
                     </div>
                 </div>
-                <button type="submit" style="float: right; display:inline;" class="btn btn-success" [disabled]="!paymentForm.valid">Pay!</button>
-            </form>
-        </div>
-        <div class="panel-body" *ngIf="account.Transactions!=null">
-            <app-account-payments [Transactions]="account.Transactions"></app-account-payments>
-        </div>
+            </div>
+            <button type="submit" style="float: right; display:inline;" class="btn btn-default form-control" [disabled]="!paymentForm.valid">Pay!</button>
+        </form>
+    </div>
+    <div class="panel-body" *ngIf="account.Transactions!=null">
+        <app-account-payments [Transactions]="account.Transactions"></app-account-payments>
     </div>
 </div>

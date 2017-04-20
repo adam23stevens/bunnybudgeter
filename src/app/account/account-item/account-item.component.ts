@@ -100,6 +100,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
          }
                   
         date.setDate(date.getDate() - minusDates);  
+        date.setHours(1,0,0,0);
 
         if (date <= today) {
           m.Payments[m.Payments.length -1].isPending = false;                    
@@ -108,6 +109,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
             this.addPaymentToAccount(payment, m.isCredit);
           } 
           var nextPayDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+          nextPayDate.setHours(1,0,0,0);
           m.Payments.push(new Payment(payment.Name, payment.Amount, nextPayDate, "", true, m.isCredit));     
           m.NextPaymentDate = nextPayDate;
           this.accountService.EditMonthlyPayment(m, m.MonthlyPaymentId);
@@ -133,15 +135,20 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
 
       this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId).subscribe(
        (mp: MonthlyPayment[]) => {
+         if (this.account == undefined) return;
          var today = new Date();
-         var mPayDay = new Date(today.getFullYear(), today.getMonth(), this.account.PayDay);
+         var mPayDay = new Date();
+         mPayDay.setDate(this.account.PayDay);
+         mPayDay.setHours(1,0,0,0);
          if (today <= mPayDay) {
            this.nextPayDate = mPayDay;
          } else {
            this.nextPayDate = new Date(mPayDay.getFullYear(), mPayDay.getMonth() + 1, mPayDay.getDate());
          }
          for (let m of mp) {
-           if (m.NextPaymentDate < this.nextPayDate) {
+           var thisDate = new Date(m.NextPaymentDate);
+           thisDate.setHours(1,0,0,0);
+           if (thisDate < this.nextPayDate) {
              this.totalFundsAfterMonthlyPayments -= m.Amount;
            }
          }
