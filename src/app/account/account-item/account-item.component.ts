@@ -134,8 +134,10 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       //calculate the remaining funds with the payment types and check if you have enough money to cover all of them here
 
       this.accountService.getAllMonthlyPaymentsFromAccount2(this.accountId).subscribe(
-       (mp: MonthlyPayment[]) => {
+       (mp: MonthlyPayment[]) => {         
          if (this.account == undefined) return;
+         if (this.accountId == undefined) return;
+         mp = mp.filter(m => m.AccountId == this.accountId);
          var today = new Date();
          var mPayDay = new Date();
          mPayDay.setDate(this.account.PayDay);

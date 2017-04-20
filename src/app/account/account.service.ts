@@ -146,7 +146,7 @@ export class AccountService implements OnInit {
     return this.monthlyPayments.filter(p => p.AccountId == accountId);
   }
 
-  public getAllMonthlyPaymentsFromAccount2(accountId: string) {    
+  public getAllMonthlyPaymentsFromAccount2(accountId: string) {       
     const token = this.userService.getTokener();
     return this.http.get(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token)
     .map((response: Response) => response.json())
@@ -247,14 +247,14 @@ export class AccountService implements OnInit {
     const headers = new Headers();
     headers.append('Content-Type', 'application.json');
 
-    this.http.put(this.dataUrl + 'accounts.json?auth=' + token, body, {headers: headers})
+    this.http.put(this.dataService.getAccessUrl() + 'accounts.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
       .subscribe(() => alert('Account edited successfully'));    
   }
 
   fetchPayments(){
     const token = this.userService.getTokener();
-    return this.http.get(this.dataUrl + 'payments.json?auth=' + token)
+    return this.http.get(this.dataService.getAccessUrl() + 'payments.json?auth=' + token)
     .map(response => response.json());
   }  
 
