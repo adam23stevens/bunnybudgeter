@@ -109,6 +109,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
             this.addPaymentToAccount(payment, m.isCredit);
           } 
           var nextPayDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+          nextPayDate.setDate(m.DayOfMonth);
           nextPayDate.setHours(1,0,0,0);
           m.Payments.push(new Payment(payment.Name, payment.Amount, nextPayDate, "", true, m.isCredit));     
           m.NextPaymentDate = nextPayDate;
