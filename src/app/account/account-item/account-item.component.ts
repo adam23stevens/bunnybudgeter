@@ -105,9 +105,9 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         if (date <= today) {
           m.Payments[m.Payments.length -1].isPending = false;                    
           var payment = m.Payments[m.Payments.length -1];          
-          if (m.isCredit) {            
-            this.addPaymentToAccount(payment, m.isCredit);
-          } 
+          
+          this.addPaymentToAccount(payment, m.isCredit);
+          
           var nextPayDate = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
           nextPayDate.setDate(m.DayOfMonth);
           nextPayDate.setHours(1,0,0,0);
