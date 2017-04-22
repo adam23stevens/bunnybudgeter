@@ -90,8 +90,8 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     //  this.accountService.monthlyPaymentsUpdated.subscribe((mp : MonthlyPayment[]) => { 
        if (mp == null) return; 
        var today = new Date();
-       for (let m of mp) {    
-        if(m.AccountId != this.accountId) return;
+       for (let m of mp.filter(m => m.AccountId == this.accountId)) {    
+        //if(m.AccountId != this.accountId) return;        
 
          var date =  new Date(m.Payments[m.Payments.length -1].Date);       
 
