@@ -9,7 +9,7 @@
                     <th style="text-align: center;">
                         Account Balance
                     </th>
-                    <th style="text-align: center;">
+                    <th style="text-align: center;" *ngIf="showOverdraft">
                         Including Overdraft
                     </th>
                     <th style="text-align: center;">
@@ -22,7 +22,7 @@
                     <td style="text-align: center;">
                         <i>{{account?.TotalFunds | currency:'GBP':1.2-2}}</i>
                     </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center;" *ngIf="showOverdraft">
                         <i>{{totalFundsWithOverdraft | currency:'GBP':1.2-2}}</i>
                     </td>
                     <td style="text-align: center;">

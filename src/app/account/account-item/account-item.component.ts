@@ -42,6 +42,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
   paymentCutOffDate: Date;
   Warning: string = "";
   nextPayDate = new Date();
+  showOverdraft: boolean = false;
 
   constructor(private accountService: AccountService,
               private paymentTypeService: PaymentTypesService,
@@ -78,6 +79,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
     getAccountInfo() {
       if (this.accountId != undefined){
       this.account = this.accountService.getAccountById(this.accountId);        
+      this.showOverdraft = this.account.OverdraftLimit > 0;
       }
    }
 
