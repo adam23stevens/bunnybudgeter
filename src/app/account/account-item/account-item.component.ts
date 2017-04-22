@@ -297,9 +297,12 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
             this.remainingFunds - p.Amount :
             0;
           }
-          );
-          if (parseFloat(this.account.TotalFunds.toString()) +
-           parseFloat(this.account.OverdraftLimit.toString()) < parseFloat(this.remainingFunds.toString()))
+          );          
+          if (
+          //  parseFloat(this.account.TotalFunds.toString()) +            
+          //  parseFloat(this.account.OverdraftLimit.toString())
+          parseFloat(this.totalFundsAfterMonthlyPayments.toString())
+            < parseFloat(this.remainingFunds.toString()))
           {
             this.showRemaining = false;
             this.Warning = 'Warning! you have gone over budget and cannot afford any more for this payment type. Please use adhoc payment';     
