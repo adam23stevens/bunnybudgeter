@@ -271,7 +271,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       if (pType != null) {        
         this.remainingFunds = pType.MonthlyAllowance;
         this.paymentIsCredit = pType.IsCredit;
-        this.paymentIsCreditEnable = false;
+        //this.paymentIsCreditEnable = false;
         
         this.showRemaining = !pType.IsCredit;
 
@@ -293,9 +293,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
           {
             var thisDate = new Date(p.Date);
             if (thisDate >= this.paymentCutOffDate)
+            if (p.isCredit){
+              this.remainingFunds = +this.remainingFunds + +p.Amount;
+            }
+            if (!p.isCredit){
             this.remainingFunds = this.remainingFunds - p.Amount >= 0 ? 
             this.remainingFunds - p.Amount :
-            0;
+            0;}
           }
           );          
           if (
