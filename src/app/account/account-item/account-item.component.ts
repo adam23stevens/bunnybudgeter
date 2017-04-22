@@ -134,8 +134,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
        (mp: MonthlyPayment[]) => {         
          if (this.account == undefined) return;
          if (this.accountId == undefined) return;
-         mp = mp.filter(m => m.AccountId == this.accountId);
-         alert(mp.length);
+         mp = mp.filter(m => m.AccountId == this.accountId);         
          var today = new Date();
          var mPayDay = new Date();
          mPayDay.setDate(this.account.PayDay);
