@@ -215,7 +215,9 @@ export class AccountService implements OnInit {
     if (this.updatedAccount.Transactions == null) {
       this.updatedAccount.Transactions = new Array<Payment>();
     }
+    if (this.updatedAccount.Transactions.indexOf(newPayment) == -1){
     this.updatedAccount.Transactions.push(newPayment);
+    }
     
     return this.EditAccountNew(this.updatedAccount, accountId);
   }   
