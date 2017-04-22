@@ -191,7 +191,7 @@ export class AccountService implements OnInit {
 
       this.http.put(this.dataService.getAccessUrl() + 'monthlypayments.json?auth=' + token, body, {headers: headers})
       .map((data: Response) => data.json())
-      .subscribe(() => alert('done'));          
+      .subscribe();          
     });
   }
 

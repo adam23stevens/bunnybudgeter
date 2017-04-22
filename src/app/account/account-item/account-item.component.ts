@@ -89,17 +89,13 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
        if (mp == null) return; 
        var today = new Date();
        for (let m of mp) {    
+        if(m.AccountId != this.accountId) return;
 
          var date =  new Date(m.Payments[m.Payments.length -1].Date);       
-         var minusDates = 0;
-         if (date.getDay() == 0){ //this is a sunday
-          minusDates = 2;
+
+         if (m.Payments[m.Payments.length-1].isCredit){
+          date = this.setWeekendDate(date);
          }
-         else if (date.getDay() == 6) { //this is a saturday
-           minusDates = 1;
-         }
-                  
-        date.setDate(date.getDate() - minusDates);  
         date.setHours(1,0,0,0);
 
         if (date <= today) {
@@ -139,19 +135,25 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
          if (this.account == undefined) return;
          if (this.accountId == undefined) return;
          mp = mp.filter(m => m.AccountId == this.accountId);
+         alert(mp.length);
          var today = new Date();
          var mPayDay = new Date();
          mPayDay.setDate(this.account.PayDay);
          mPayDay.setHours(1,0,0,0);
+         
+         mPayDay = this.setWeekendDate(mPayDay);         
+
          if (today <= mPayDay) {
            this.nextPayDate = mPayDay;
          } else {
            this.nextPayDate = new Date(mPayDay.getFullYear(), mPayDay.getMonth() + 1, mPayDay.getDate());
+           this.nextPayDate.setDate(this.account.PayDay);
+           this.nextPayDate = this.setWeekendDate(this.nextPayDate);           
          }
          for (let m of mp) {
            var thisDate = new Date(m.NextPaymentDate);
            thisDate.setHours(1,0,0,0);
-           if (thisDate < this.nextPayDate) {
+           if (thisDate < this.nextPayDate) {             
              this.totalFundsAfterMonthlyPayments -= m.Amount;
            }
          }
@@ -169,6 +171,18 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
       Amount: [amount, Validators.required]
     });
   }     
+
+  private setWeekendDate(date: Date) {
+    var minusDates = 0;
+          if (date.getDay() == 0){ //this is a sunday
+           minusDates = 2;
+          }
+          else if (date.getDay() == 6) { //this is a saturday
+             minusDates = 1;
+          }                  
+          date.setDate(date.getDate() - minusDates);  
+          return date;
+  }
 
   onSubmit(){
 
