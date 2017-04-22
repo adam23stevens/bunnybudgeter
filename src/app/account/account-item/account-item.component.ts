@@ -268,10 +268,14 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
         //if this is in the past then a okay
         //if it's in the future then take a month off.
         var today = new Date();
-        this.paymentCutOffDate = new Date(today.getFullYear(), today.getMonth(), this.account.PayDay);
+        this.paymentCutOffDate = new Date(today.getFullYear(), today.getMonth(), this.account.PayDay);        
         this.paymentCutOffDate.setDate(this.account.PayDay);
+        this.paymentCutOffDate = this.setWeekendDate(this.paymentCutOffDate);
+        this.paymentCutOffDate.setHours(1,0,0,0);
         if (today <= this.paymentCutOffDate) {
           this.paymentCutOffDate = new Date(today.getFullYear(), today.getMonth() -1, this.account.PayDay);
+          this.paymentCutOffDate = this.setWeekendDate(this.paymentCutOffDate);
+          this.paymentCutOffDate.setHours(1,0,0,0);
         }                
         if (pType.Payments != null) {          
           pType.Payments.forEach(p =>
@@ -279,7 +283,7 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
             var thisDate = new Date(p.Date);
             if (thisDate >= this.paymentCutOffDate)
             this.remainingFunds = this.remainingFunds - p.Amount >= 0 ? 
-            this.remainingFunds -= p.Amount :
+            this.remainingFunds - p.Amount :
             0;
           }
           );
