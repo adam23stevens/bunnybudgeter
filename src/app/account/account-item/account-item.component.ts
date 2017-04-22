@@ -149,13 +149,24 @@ export class AccountItemComponent implements OnInit, OnChanges, OnDestroy {
            this.nextPayDate.setDate(this.account.PayDay);
            this.nextPayDate = this.setWeekendDate(this.nextPayDate);           
          }
-         for (let m of mp) {
+         var extraAmount: number = 0;
+         for (let m of mp.filter(m => m.isCredit == false)) {           
            var thisDate = new Date(m.NextPaymentDate);
            thisDate.setHours(1,0,0,0);
-           if (thisDate < this.nextPayDate) {             
-             this.totalFundsAfterMonthlyPayments -= m.Amount;
+           if (thisDate < this.nextPayDate) {                       
+             extraAmount -= m.Amount;
            }
          }
+         for (let m of mp.filter(m => m.isCredit == true)) {
+            var thisDate = new Date(m.NextPaymentDate);
+           thisDate.setHours(1,0,0,0);
+           if (thisDate < this.nextPayDate) {               
+             extraAmount = +extraAmount + +m.Amount;             
+           }
+         }
+         this.totalFundsAfterMonthlyPayments =
+         +this.totalFundsAfterMonthlyPayments +
+         +extraAmount;
        });
 
    }
